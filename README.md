@@ -55,6 +55,7 @@ Open-source and lore-friendly alternative to Open All Interiors script. It does 
 38. Fleeca Banks Vaults
 
 ## Credits:
+- Alex106 - [Scenario Groups Mod](https://www.gta5-mods.com/scripts/scenario-groups)
 - Bob74 - [bob74_ipl](https://github.com/Bob74/bob74_ipl) - Interior prop examples
 - [RAGE Multiplayer Wiki](https://wiki.rage.mp/index.php?title=Interior_Props) - Interior prop documentation
 - [alt:V Documentation](https://docs.altv.mp/gta/articles/references/interiors-and-locations.html) - Interiors & Locations (IPLs)
