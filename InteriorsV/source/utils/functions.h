@@ -1,6 +1,6 @@
 #pragma once
 
-char* ToString(Any var);
+//char* ToString(Any var);
 void Print(char* string, int ms);
 void LoadIPL(char* ipl);
 void UnloadIPL(char* ipl);
@@ -11,3 +11,4 @@ void DeleteObject(Hash EntityHash, float x, float y, float z);
 void EnableInteriorProp(int interior, char* prop, bool refresh);
 void DisableInteriorProp(int interior, char* prop, bool refresh);
 void SetScenarioGroup(char* scenarioGroup, bool toggle);
+void AddBlip(float x, float y, float z, float scale, char* title, int id, int colour);

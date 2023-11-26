@@ -1,9 +1,9 @@
 //ScriptHook
-#include "natives.h"
-#include "types.h"
+#include <natives.h>
+#include <types.h>
 //Custom
 #include "functions.h"
-#include "globals.h"
+#include "../globals.h"
 
 Hash doorHash;
 
@@ -108,5 +108,19 @@ void SetScenarioGroup(char* scenarioGroup, bool toggle)
 	{
 		AI::SET_SCENARIO_GROUP_ENABLED(scenarioGroup, toggle);
 	}
+	return;
+}
+
+void AddBlip(float x, float y, float z, float scale, char* title, int id, int colour)
+{
+	Blip blip = UI::ADD_BLIP_FOR_COORD(x, y, z);
+	UI::SET_BLIP_SPRITE(blip, id);
+	UI::SET_BLIP_DISPLAY(blip, 4);
+	UI::SET_BLIP_SCALE(blip, scale);
+	UI::SET_BLIP_COLOUR(blip, colour);
+	UI::SET_BLIP_AS_SHORT_RANGE(blip, true);
+	UI::BEGIN_TEXT_COMMAND_SET_BLIP_NAME("STRING");
+	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(title);
+	UI::END_TEXT_COMMAND_SET_BLIP_NAME(blip);
 	return;
 }

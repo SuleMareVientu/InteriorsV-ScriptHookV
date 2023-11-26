@@ -1,11 +1,13 @@
 //ScriptHook
-#include "natives.h"
-#include "types.h"
-#include "main.h"
+#include <natives.h>
+#include <types.h>
+#include <main.h>
 //Custom
 #include "script.h"
 #include "globals.h"
-#include "interiors.h"
+#include "utils\ini.h"
+#include "utils\blips.h"
+#include "utils\interiors.h"
 
 Vector3 playerLoc;
 
@@ -54,7 +56,7 @@ static void update()
 	SandySheriffOffice();
 	PoliceStationRooms();
 	GarageNearUD();
-	YanktonSurveillance(); 
+	YanktonSurveillance();
 	PacificBankVault();
 	FleecaBanks();
 
@@ -68,6 +70,8 @@ static void update()
 
 void ScriptMain()
 {
+	ReadINI();
+	AddBlips();
 	SYSTEM::SETTIMERA(0);
 	while (true)
 	{

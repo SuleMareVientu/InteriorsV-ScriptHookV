@@ -1,9 +1,9 @@
 //ScriptHook
-#include "natives.h"
-#include "types.h"
+#include <natives.h>
+#include <types.h>
 //Custom
+#include "..\globals.h"
 #include "interiors.h"
-#include "globals.h"
 #include "functions.h"
 
 float distance = 100000.0;  //use VDIST2 to save on resources by not calculating the sqr: sqr100000 = 315 units 
@@ -13,6 +13,9 @@ float distance = 100000.0;  //use VDIST2 to save on resources by not calculating
 //Clinton Residence (Franklin's Aunt House)
 void ClintonResidence()
 {
+	if (!iniClintonResidence)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -15.0, -1441.0, 31.0) < distance)
 	{
 		LoadIPL("v_franklins");
@@ -25,12 +28,15 @@ void ClintonResidence()
 //3671 Whispymound Drive (Franklin's Mansion)
 void FranklinMansion()
 {
+	if (!iniFranklinMansion)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 8.0, 540.0, 176.0) < distance)
 	{
 		int v_franklinshouse = INTERIOR::GET_INTERIOR_AT_COORDS(7.3, 531.3, 175.9);
 		LoadIPL("v_franklinshouse");
 		EnableInterior(v_franklinshouse);
-		DisableInteriorProp(v_franklinshouse, "locked", true);
+		DisableInteriorProp(v_franklinshouse, "locked", false);
 		EnableInteriorProp(v_franklinshouse, "unlocked", true);
 		OBJECT::_DOOR_CONTROL(308207762, 7.518359, 539.5268, 176.1776, false, 0.0, 0.0, 0.0);	// front
 		OBJECT::_DOOR_CONTROL(2052512905, 18.65038, 546.3401, 176.3448, false, 0.0, 0.0, 0.0);	// garage
@@ -41,6 +47,9 @@ void FranklinMansion()
 //Michael's House
 void MichaelHouse()
 {
+	if (!iniMichaelHouse)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -820.0, 165.0, 70.0) < distance)
 	{
 		int v_michael = INTERIOR::GET_INTERIOR_AT_COORDS(-809.2, 180.7, 73.2);
@@ -76,6 +85,9 @@ void MichaelHouse()
 //Trevor's Trailer
 void TrevorTrailer()
 {
+	if (!iniTrevorTrailer)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1973.0, 3815.0, 34.0) < distance)
 	{
 		if (!STREAMING::IS_IPL_ACTIVE("TrevorsTrailerTrash"))
@@ -94,6 +106,9 @@ void TrevorTrailer()
 //Premium Deluxe Motorsport (Simeon's Showroom)
 void PremiumDeluxeMotorsport()
 {
+	if (!iniPremiumDeluxeMotorsport)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -45.0, -1100.0, 27.0) < distance)
 	{
 		UnloadIPL("fakeint");
@@ -102,7 +117,7 @@ void PremiumDeluxeMotorsport()
 		LoadIPL("shr_int_lod");
 		int v_carshowroom = INTERIOR::GET_INTERIOR_AT_COORDS(-44.0, -1097.5, 27.0);
 		EnableInterior(v_carshowroom);
-		DisableInteriorProp(v_carshowroom, "shutter_closed", true);
+		DisableInteriorProp(v_carshowroom, "shutter_closed", false);
 		EnableInteriorProp(v_carshowroom, "shutter_open", true);
 		OBJECT::_DOOR_CONTROL(1417577297, -37.33113, -1108.873, 26.7198, false, 0.0, 0.0, 0.0);		// front
 		OBJECT::_DOOR_CONTROL(2059227086, -39.13366, -1108.218, 26.7198, false, 0.0, 0.0, 0.0);		// front
@@ -122,6 +137,9 @@ void PremiumDeluxeMotorsport()
 //Lester's House
 void LesterHouse()
 {
+	if (!iniLesterHouse)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1274.0, -1720.0, 55.0) < distance)
 	{
 		LoadIPL("v_lesters");
@@ -135,7 +153,7 @@ void LesterHouse()
 //Darnell Bros. Factory (Leaster's Factory)
 void LesterFactory()
 {
-	if (STREAMING::IS_IPL_ACTIVE("id2_14_post_no_int") || STREAMING::IS_IPL_ACTIVE("id2_14_during1") || STREAMING::IS_IPL_ACTIVE("id2_14_during2") || STREAMING::IS_IPL_ACTIVE("id2_14_on_fire"))
+	if (!iniLesterFactory || STREAMING::IS_IPL_ACTIVE("id2_14_post_no_int") || STREAMING::IS_IPL_ACTIVE("id2_14_during1") || STREAMING::IS_IPL_ACTIVE("id2_14_during2") || STREAMING::IS_IPL_ACTIVE("id2_14_on_fire"))
 		return;
 
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 717.0, -975.0, 25.0) < distance)
@@ -166,6 +184,9 @@ void LesterFactory()
 //Lifeinvader Office
 void Lifeinvader()
 {
+	if (!iniLifeinvader)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -1050.0, -235.0, 40.0) < distance)
 	{
 		UnloadIPL("facelobbyfake");
@@ -191,7 +212,7 @@ void Lifeinvader()
 //Floyd's Apartment
 void FloydHouse()
 {
-	if (!STREAMING::IS_IPL_ACTIVE("vb_30_crimetape"))
+	if (iniFloydHouse && !STREAMING::IS_IPL_ACTIVE("vb_30_crimetape"))
 		OBJECT::_DOOR_CONTROL(-607040053, -1149.709, -1521.088, 10.78267, false, 0.0, 0.0, 0.0);	// front
 	return;
 }
@@ -199,7 +220,7 @@ void FloydHouse()
 //Vangelico Jewelry Store
 void Vangelico()
 {
-	if (STREAMING::IS_IPL_ACTIVE("bh1_16_refurb"))
+	if (!iniVangelico || STREAMING::IS_IPL_ACTIVE("bh1_16_refurb"))
 		return;
 
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -630.0, -238.0, 38.0) < distance)
@@ -224,7 +245,7 @@ void Vangelico()
 //Max Renda Construction Site
 void MaxRenda()
 {
-	if (STREAMING::IS_IPL_ACTIVE("bh1_16_doors_shut"))
+	if (iniMaxRenda && STREAMING::IS_IPL_ACTIVE("bh1_16_doors_shut"))
 	{
 		UnloadIPL("bh1_16_doors_shut");
 		LoadIPL("refit_unload");
@@ -236,6 +257,9 @@ void MaxRenda()
 //FIB Lobby
 void FIBLobby()
 {
+	if (!iniFIBLobby)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 106.0, -745.0, 46.0) < distance)
 	{
 		UnloadIPL("FIBlobbyfake");
@@ -259,6 +283,9 @@ void FIBLobby()
 //Hayes Autos Chopshop (Devin Weston's Chop Shop)
 void Chopshop()
 {
+	if (!iniChopshop)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 485.0, -1315.0, 30.0) < distance)
 	{
 		LoadIPL("v_chopshop");
@@ -284,6 +311,9 @@ void Chopshop()
 //Tequi-la-la
 void TequiLaLa()
 {
+	if (!iniTequiLaLa)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -565.0, 277.0, 84.0) < distance)
 	{
 		LoadIPL("v_rockclub");
@@ -301,6 +331,9 @@ void TequiLaLa()
 //Maze Bank Arena (Fame or Shame)
 void FameorShame()
 {
+	if (!iniFameorShame)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -262.0, -2021.0, 36.0) < distance)
 	{
 		UnloadIPL("sp1_10_fake_interior");
@@ -321,6 +354,9 @@ void FameorShame()
 //Clucking Bell Farms
 void CluckingBell()
 {
+	if (!iniCluckingBell)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -71.0, 6266.0, 32.0) < distance)
 	{
 		UnloadIPL("CS1_02_cf_offmission");
@@ -343,6 +379,9 @@ void CluckingBell()
 //Grand Banks Steel Foundry
 void Foundry()
 {
+	if (!iniFoundry)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1085.0, -2000.0, 35.0) < distance)
 	{
 		LoadIPL("v_foundry");
@@ -361,6 +400,9 @@ void Foundry()
 //Epsilon Encounter Room
 void EpsilonRoom()
 {
+	if (!iniEpsilonRoom)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 241.0, 361.0, 106.0) < distance)
 	{
 		LoadIPL("v_epsilonism");
@@ -377,6 +419,9 @@ void EpsilonRoom()
 //Harvey Molina's Apartment (Janitor's House)
 void JanitorHouse()
 {
+	if (!iniJanitorHouse)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -108.0, -9.0, 71.0) < distance)
 	{
 		LoadIPL("v_janitor");
@@ -392,7 +437,7 @@ void JanitorHouse()
 //O'Neil Ranch
 void ONeilRanch()
 {
-	if (STREAMING::IS_IPL_ACTIVE("farm_burnt") || STREAMING::IS_IPL_ACTIVE("des_farmhs_endimap"))
+	if (!iniONeilRanch || STREAMING::IS_IPL_ACTIVE("farm_burnt") || STREAMING::IS_IPL_ACTIVE("des_farmhs_endimap"))
 		return;
 
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 2445.0, 4976.0, 50.0) < distance)
@@ -421,6 +466,9 @@ void ONeilRanch()
 //Rogers Salvage & Scrap (Scrapyard)
 void Scrapyard()
 {
+	if (!iniScrapyard)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -605.0, -1615.0, 27.0) < distance)
 	{
 		LoadIPL("v_recycle");
@@ -444,6 +492,9 @@ void Scrapyard()
 //Humane Lab
 void HumaneLab()
 {
+	if (!iniHumaneLab)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 3625.0, 3750.0, 28.0) < distance)
 	{
 		LoadIPL("v_lab");
@@ -460,6 +511,9 @@ void HumaneLab()
 //Omega's Garage
 void OmegaGarage()
 {
+	if (!iniOmegaGarage)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 2333.0, 2575.0, 47.0) < distance)
 	{
 		OBJECT::_DOOR_CONTROL(-26664553, 2333.235, 2574.973, 47.03088, false, 0.0, 0.0, 0.0);	// front
@@ -471,6 +525,9 @@ void OmegaGarage()
 //Blaine County Savings Bank
 void BlaineCountyBank()
 {
+	if (!iniBlaineCountyBank)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -110.0, 6462.0, 32.0) < distance)
 	{
 		LoadIPL("v_bank4");
@@ -488,6 +545,9 @@ void BlaineCountyBank()
 //Dignity Yacht
 void DignityYacht()
 {
+	if (!iniDignityYacht)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -2073.0, -1024.0, 4.0) < 250000.0)
 	{
 		LoadIPL("smboat");
@@ -508,7 +568,7 @@ void DignityYacht()
 //SS Bulker Container Ship
 void ContainerShip()
 {
-	if (STREAMING::IS_IPL_ACTIVE("sunkcargoship") || STREAMING::IS_IPL_ACTIVE("SUNK_SHIP_FIRE"))
+	if (!iniContainerShip || STREAMING::IS_IPL_ACTIVE("sunkcargoship") || STREAMING::IS_IPL_ACTIVE("SUNK_SHIP_FIRE"))
 		return;
 
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -228.0, -2366.0, 17.0) < 250000.0)
@@ -527,6 +587,9 @@ void ContainerShip()
 //Union Depository Vault
 void UnionDepositoryVault()
 {
+	if (!iniUnionDepositoryParking)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 15.0, -690.0, 45.0) < distance)
 		LoadIPL("FINBANK");
 	else
@@ -537,6 +600,9 @@ void UnionDepositoryVault()
 //Union Depository Parking
 void UnionDepositoryParking()
 {
+	if (!iniUnionDepositoryParking)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -16.0, -685.00, 34.0) < distance)
 	{
 		UnloadIPL("dt1_03_shutter");
@@ -554,6 +620,9 @@ void UnionDepositoryParking()
 //Los Santos Naval Port Gates (Merryweather's Dock)
 void MerryweatherDock()
 {
+	if (!iniMerryweatherDock)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 492.0, -3116.0, 5.0) < distance)
 	{
 		OBJECT::_DOOR_CONTROL(1286392437, 492.2758, -3115.934, 5.162354, false, 0.0, 0.0, 0.0);	// internal
@@ -565,6 +634,9 @@ void MerryweatherDock()
 //Vanilla Unicorn Back Door
 void StripclubBackDoor()
 {
+	if (!iniStripclubBackDoor)
+		return;
+
 	OBJECT::_DOOR_CONTROL(668467214, 96.09197, -1284.854, 29.43878, false, 0.0, 0.0, 0.0);	// internal
 	return;
 }
@@ -572,6 +644,9 @@ void StripclubBackDoor()
 //Raven Slaughterhouse
 void Slaughterhouse()
 {
+	if (!iniSlaughterhouse)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 994.0, -2143.0, 31.5) < distance)
 	{
 		LoadIPL("v_abattoir");
@@ -601,6 +676,9 @@ void Slaughterhouse()
 //Paleto Bay Sheriff's Office
 void PaletoSheriffOffice()
 {
+	if (!iniPaletoSheriffOffice)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -445.0, 6017.0, 32.0) < distance)
 	{
 		UnloadIPL("cs1_16_sheriff_cap");
@@ -621,6 +699,9 @@ void PaletoSheriffOffice()
 //Sandy Shores Sheriff's Office
 void SandySheriffOffice()
 {
+	if (!iniSandySheriffOffice)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1856.0, 3684.0, 35.0) < distance)
 	{
 		UnloadIPL("sheriff_cap");
@@ -640,6 +721,9 @@ void SandySheriffOffice()
 //Mission Row Police Station Captain's Office & Armery
 void PoliceStationRooms()
 {
+	if (!iniPoliceStationRooms)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 447.0, -980.0, 31.0) < distance)
 	{
 		OBJECT::_DOOR_CONTROL(-1320876379, 446.5728, -980.0104, 30.8393, false, 0.0, 0.0, 0.0);	// internal
@@ -651,6 +735,9 @@ void PoliceStationRooms()
 //Garage Near Union Depository
 void GarageNearUD()
 {
+	if (!iniGarageNearUD)
+		return;
+
 	AltUnlockDoor(-190780785, -33.80561, -621.6387, 36.06102);	// front
 	return;
 }
@@ -658,6 +745,9 @@ void GarageNearUD()
 //North Yankton Surveillance Room
 void YanktonSurveillance()
 {
+	if (!iniYanktonSurveillance)
+		return;
+
 	OBJECT::_DOOR_CONTROL(-311575617, 5305.461, -5177.75, 83.66856, false, 0.0, 0.0, 0.0);	// internal
 	return;
 }
@@ -665,6 +755,9 @@ void YanktonSurveillance()
 //Pacific Standard Public Deposit Bank Vault
 void PacificBankVault()
 {
+	if (!iniPacificBankVault)
+		return;
+
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 266.0, 217.6, 110.0) < distance)
 	{
 		OBJECT::_DOOR_CONTROL(1956494919, 266.3624, 217.5697, 110.4328, false, 0.0, 0.0, 0.0);	// internal
@@ -676,6 +769,9 @@ void PacificBankVault()
 //Fleeca Banks Vaults
 void FleecaBanks()
 {
+	if (!iniFleecaBanks)
+		return;
+
 	//Fleeca Bank - Blaine County
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1179.0, 2709.0, 38.0) < distance)
 	{
@@ -725,6 +821,9 @@ void FleecaBanks()
 
 void ScenarioGroups()
 {
+	if (!iniScenarioGroups)
+		return;
+
 	//Ammunations NPCs: Chumash, Del Perro, Great Chaparral, Hawick, La Mesa, Little Seoul, Pillbox Hill, Sandy Shores
 	SetScenarioGroup("ammunation", true);
 
@@ -759,6 +858,9 @@ void ScenarioGroups()
 
 void Fixes()
 {
+	if (!iniFixes)
+		return;
+
 	UnloadIPL("CS3_07_MPGates");
 	LoadIPL("chop_props");
 	LoadIPL("railing_start");
@@ -782,8 +884,7 @@ void Fixes()
 void UnlockDoors()
 {
 	//Michael's House Gate
-
-	if (PED::GET_PED_TYPE(PLAYER::PLAYER_PED_ID()) != 0 && OBJECT::DOOR_SYSTEM_FIND_EXISTING_DOOR(-844.051, 155.9619, 66.03221, -2125423493, &doorHash))
+	if (iniMichaelHouse && PED::GET_PED_TYPE(PLAYER::PLAYER_PED_ID()) != 0 && OBJECT::DOOR_SYSTEM_FIND_EXISTING_DOOR(-844.051, 155.9619, 66.03221, -2125423493, &doorHash))
 	{
 		OBJECT::_SET_DOOR_ACCELERATION_LIMIT(doorHash, 0, false, false);
 		OBJECT::DOOR_SYSTEM_SET_AUTOMATIC_RATE(doorHash, 1.0, false, false);
@@ -791,7 +892,7 @@ void UnlockDoors()
 	}
 
 	//Chopshop
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 485.0, -1315.0, 30.0) < distance)
+	if (iniChopshop && SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 485.0, -1315.0, 30.0) < distance)
 	{
 		AltUnlockDoor(-664582244, 482.8112, -1311.953, 29.35057);
 		if (!OBJECT::_DOES_DOOR_EXIST(-190140885))
@@ -805,7 +906,7 @@ void UnlockDoors()
 	}
 
 	//Scrapyard
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -605.0, -1615.0, 27.0) < distance)
+	if (iniScrapyard && SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -605.0, -1615.0, 27.0) < distance)
 	{
 		OBJECT::_DOOR_CONTROL(1099436502, -608.7289, -1610.315, 27.15894, false, 0.0, 0.0, 0.0);
 		OBJECT::_DOOR_CONTROL(-1627599682, -611.32, -1610.089, 27.15894, false, 0.0, 0.0, 0.0);
@@ -814,7 +915,7 @@ void UnlockDoors()
 	}
 
 	//Foundry
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1085.0, -2000.0, 35.0) < distance)
+	if (iniFoundry && SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1085.0, -2000.0, 35.0) < distance)
 	{
 		OBJECT::_DOOR_CONTROL(-1428622127, 1083.547, -1975.435, 31.62222, false, 0.0, 0.0, 0.0);
 		OBJECT::_DOOR_CONTROL(-1428622127, 1065.237, -2006.079, 32.23295, false, 0.0, 0.0, 0.0);
@@ -822,12 +923,14 @@ void UnlockDoors()
 	}
 
 	//Omega's Garage
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 2333.0, 2575.0, 47.0) < distance)
+	if (iniOmegaGarage && SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 2333.0, 2575.0, 47.0) < distance)
 	{
 		OBJECT::_DOOR_CONTROL(-26664553, 2333.235, 2574.973, 47.03088, false, 0.0, 0.0, 0.0);
 		OBJECT::_DOOR_CONTROL(914592203, 2329.655, 2576.642, 47.03088, false, 0.0, 0.0, 0.0);
 	}
 
-	PacificBankVault();
+	if (iniPacificBankVault)
+		PacificBankVault();
+
 	return;
 }
