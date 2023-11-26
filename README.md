@@ -4,6 +4,8 @@ Open-source and lore-friendly alternative to Open All Interiors script. It does 
 
 **Requires [ScriptHookV](http://www.dev-c.com/gtav/scripthookv/)**
 
+v1.1 - Changelog: Added blips and INI config. All interiors and blips can be disabled via INI. Disabled interiors won't show blips on the map.
+
 ## Locations (only Los Santos, full map in Releases):
 ![Screenshot](Images/Los-Santos.jpg?raw=true)
 
@@ -60,4 +62,5 @@ Open-source and lore-friendly alternative to Open All Interiors script. It does 
 - [RAGE Multiplayer Wiki](https://wiki.rage.mp/index.php?title=Interior_Props) - Interior prop documentation
 - [alt:V Documentation](https://docs.altv.mp/gta/articles/references/interiors-and-locations.html) - Interiors & Locations (IPLs)
 - [alt:V Unofficial Docs (Stuyk)](https://altv.stuyk.com/docs/articles/tables/ipls.html) - Missing Interiors IPLs
+- [simpleini](https://github.com/brofield/simpleini) (distributed under MIT License)
 - Alexander Blade - ScriptHookV
