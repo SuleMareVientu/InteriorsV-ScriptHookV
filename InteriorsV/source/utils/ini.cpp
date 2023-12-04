@@ -3,6 +3,7 @@
 
 //General Settings
 bool iniBlips = false;
+bool iniStoryCompatibility = true;
 bool iniSafehouses = true;
 bool iniMissionInteriors = true;
 bool iniUnusedInteriors = true;
@@ -44,9 +45,11 @@ bool iniSlaughterhouse = false;
 bool iniPaletoSheriffOffice = false;
 bool iniSandySheriffOffice = false;
 bool iniPoliceStationRooms = false;
-bool iniGarageNearUD = false;
 bool iniYanktonSurveillance = false;
 bool iniPacificBankVault = false;
+bool iniGarageNearUD = false;
+bool iniPierGates = false;
+bool iniGarageNearAMC = false;
 bool iniFleecaBanks = false;
 
 //Extras
@@ -65,6 +68,7 @@ void ReadINI()
 
 //////////////////////////////////////Settings//////////////////////////////////////
 	iniBlips = ini.GetBoolValue("Settings", "Blips", false);
+	iniStoryCompatibility = ini.GetBoolValue("Settings", "StoryCompatibility", true);
 	iniSafehouses = ini.GetBoolValue("Settings", "Safehouses", true);
 	iniMissionInteriors = ini.GetBoolValue("Settings", "MissionInteriors", true);
 	iniUnusedInteriors = ini.GetBoolValue("Settings", "UnusedInteriors", true);
@@ -116,10 +120,12 @@ void ReadINI()
 		iniPaletoSheriffOffice = ini.GetBoolValue("Interiors", "PaletoSheriffOffice", true);
 		iniSandySheriffOffice = ini.GetBoolValue("Interiors", "SandySheriffOffice", true);
 		iniPoliceStationRooms = ini.GetBoolValue("Interiors", "PoliceStationRooms", true);
-		iniGarageNearUD = ini.GetBoolValue("Interiors", "GarageNearUD", true);
 		iniYanktonSurveillance = ini.GetBoolValue("Interiors", "YanktonSurveillance", true);
 		iniPacificBankVault = ini.GetBoolValue("Interiors", "PacificBankVault", true);
-		iniFleecaBanks = ini.GetBoolValue("Interiors", "PacificBankVault", true);
+		iniGarageNearUD = ini.GetBoolValue("Interiors", "GarageNearUD", true);
+		iniPierGates = ini.GetBoolValue("Interiors", "PierGates", true);
+		iniGarageNearAMC = ini.GetBoolValue("Interiors", "GarageNearAMC", true);
+		iniFleecaBanks = ini.GetBoolValue("Interiors", "FleecaBanks", true);
 	}
 
 //////////////////////////////////////Extras//////////////////////////////////////

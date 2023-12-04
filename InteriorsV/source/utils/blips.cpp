@@ -19,13 +19,13 @@ void AddBlips()
 	if (iniLesterHouse)
 		AddBlip(1272.11, -1715.84, 55.00, 0.90, "Lester's House", 40, colour);
 
-	if (iniLesterFactory && !STREAMING::IS_IPL_ACTIVE("id2_14_post_no_int"))
+	if (iniLesterFactory && !(iniStoryCompatibility && STREAMING::IS_IPL_ACTIVE("id2_14_post_no_int")))
 		AddBlip(718.61, -959.62, 25.00, 1.00, "Darnell Bros. Factory", 357, colour);
 
 	if (iniLifeinvader)
 		AddBlip(-1067.95, -243.73, 38.50, 0.90, "Lifeinvader Office", 184, colour);
 
-	if (iniVangelico && !STREAMING::IS_IPL_ACTIVE("bh1_16_refurb"))
+	if (iniVangelico && !(iniStoryCompatibility && STREAMING::IS_IPL_ACTIVE("bh1_16_refurb")))
 		AddBlip(-622.12, -232.67, 38.21, 1.00, "Vangelico", 171, colour);
 
 	if (iniMaxRenda)
@@ -55,7 +55,7 @@ void AddBlips()
 	if (iniJanitorHouse)
 		AddBlip(-110.37, -8.16, 70.67, 1.00, "Janitor's House", 40, colour);
 
-	if (iniONeilRanch)
+	if (iniONeilRanch && !(iniStoryCompatibility && (STREAMING::IS_IPL_ACTIVE("farm_burnt") || STREAMING::IS_IPL_ACTIVE("des_farmhs_endimap"))))
 		AddBlip(2444.87, 4975.30, 46.5, 1.00, "O'Neil Ranch", 40, colour);
 
 	if (iniScrapyard)

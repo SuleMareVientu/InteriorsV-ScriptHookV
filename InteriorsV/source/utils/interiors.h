@@ -39,9 +39,11 @@ void Slaughterhouse();
 void PaletoSheriffOffice();
 void SandySheriffOffice();
 void PoliceStationRooms();
-void GarageNearUD();
 void YanktonSurveillance();
 void PacificBankVault();
+void GarageNearUD();
+void PierGates();
+void GarageNearAMC();
 void FleecaBanks();
 
 //Scenario Groups

@@ -90,10 +90,10 @@ void TrevorTrailer()
 
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1973.0, 3815.0, 34.0) < distance)
 	{
-		if (!STREAMING::IS_IPL_ACTIVE("TrevorsTrailerTrash"))
+		if (!STREAMING::IS_IPL_ACTIVE("trevorstrailertrash"))
 		{
-			UnloadIPL("TrevorsTrailer");
-			LoadIPL("TrevorsTrailerTidy");
+			UnloadIPL("trevorstrailer");
+			LoadIPL("trevorstrailertidy");
 		}
 		OBJECT::_DOOR_CONTROL(132154435, 1972.769, 3815.366, 33.66326, false, 0.0, 0.0, 0.0);	// front
 		OBJECT::_DOOR_CONTROL(67910261, 1972.787, 3824.554, 32.65174, false, 0.0, 0.0, 0.0);	// garage
@@ -153,7 +153,10 @@ void LesterHouse()
 //Darnell Bros. Factory (Leaster's Factory)
 void LesterFactory()
 {
-	if (!iniLesterFactory || STREAMING::IS_IPL_ACTIVE("id2_14_post_no_int") || STREAMING::IS_IPL_ACTIVE("id2_14_during1") || STREAMING::IS_IPL_ACTIVE("id2_14_during2") || STREAMING::IS_IPL_ACTIVE("id2_14_on_fire"))
+	if (!iniLesterFactory || STREAMING::IS_IPL_ACTIVE("id2_14_during1") || STREAMING::IS_IPL_ACTIVE("id2_14_during2") || STREAMING::IS_IPL_ACTIVE("id2_14_on_fire"))
+		return;
+
+	if (iniStoryCompatibility && STREAMING::IS_IPL_ACTIVE("id2_14_post_no_int"))
 		return;
 
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 717.0, -975.0, 25.0) < distance)
@@ -166,6 +169,7 @@ void LesterFactory()
 		LoadIPL("id2_14_during1_lod");
 		LoadIPL("id2_14_during_door");
 		LoadIPL("id2_14_during_door_lod");
+		SetScenarioGroup("sew_machine", true);
 		OBJECT::_DOOR_CONTROL(826072862, 717.0, -975.0, 25.0, false, 0.0, 0.0, 0.0);	// front
 		OBJECT::_DOOR_CONTROL(763780711, 719.0, -975.0, 25.0, false, 0.0, 0.0, 0.0);	// front
 	}
@@ -198,6 +202,9 @@ void Lifeinvader()
 		OBJECT::_DOOR_CONTROL(-1679881977, -1083.62, -260.4166, 38.1867, false, 0.0, 0.0, 0.0);		// front
 		OBJECT::_DOOR_CONTROL(-1045015371, -1080.974, -259.0203, 38.1867, false, 0.0, 0.0, 0.0);	// front
 		OBJECT::_DOOR_CONTROL(-495720969, -1055.958, -236.4251, 44.171, false, 0.0, 0.0, 0.0);		// internal
+		//"Imagineering room"
+		OBJECT::_DOOR_CONTROL(969847031, -1057.767, -237.484, 43.021, false, 0.0, 0.0, 0.0);	// internal
+		OBJECT::_DOOR_CONTROL(969847031, -1063.842, -240.6464, 43.021, false, 0.0, 0.0, 0.0);	// internal
 	}
 	else
 	{
@@ -212,23 +219,29 @@ void Lifeinvader()
 //Floyd's Apartment
 void FloydHouse()
 {
-	if (iniFloydHouse && !STREAMING::IS_IPL_ACTIVE("vb_30_crimetape"))
-		OBJECT::_DOOR_CONTROL(-607040053, -1149.709, -1521.088, 10.78267, false, 0.0, 0.0, 0.0);	// front
+	if (!iniFloydHouse || (iniStoryCompatibility && STREAMING::IS_IPL_ACTIVE("vb_30_crimetape")))
+		return;
+	
+	UnloadIPL("vb_30_crimetape");
+	OBJECT::_DOOR_CONTROL(-607040053, -1149.709, -1521.088, 10.78267, false, 0.0, 0.0, 0.0);	// front
+	
 	return;
 }
 
 //Vangelico Jewelry Store
 void Vangelico()
 {
-	if (!iniVangelico || STREAMING::IS_IPL_ACTIVE("bh1_16_refurb"))
+	if (!iniVangelico || (iniStoryCompatibility && STREAMING::IS_IPL_ACTIVE("bh1_16_refurb")))
 		return;
 
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -630.0, -238.0, 38.0) < distance)
 	{
 		UnloadIPL("jewel2fake");
 		UnloadIPL("jewel2fake_lod");
+		UnloadIPL("bh1_16_refurb");
 		LoadIPL("post_hiest_unload");
 		LoadIPL("post_hiest_unload_lod");
+		SetScenarioGroup("vangelico", true);
 		OBJECT::_DOOR_CONTROL(9467943, -630.4265, -238.4375, 38.20653, false, 0.0, 0.0, 0.0);		// front
 		OBJECT::_DOOR_CONTROL(1425919976, -631.9554, -236.3333, 38.20653, false, 0.0, 0.0, 0.0);	// front
 	}
@@ -262,20 +275,25 @@ void FIBLobby()
 
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 106.0, -745.0, 46.0) < distance)
 	{
-		UnloadIPL("FIBlobbyfake");
-		UnloadIPL("FIBlobbyfake_lod");
-		LoadIPL("FIBlobby");
-		LoadIPL("FIBlobby_lod");
+		UnloadIPL("fiblobbyfake");
+		UnloadIPL("fiblobbyfake_lod");
+		LoadIPL("fiblobby");
+		LoadIPL("fiblobby_lod");
 		OBJECT::_DOOR_CONTROL(-1517873911, 106.3793, -742.6982, 46.51962, false, 0.0, 0.0, 0.0);	// front
 		OBJECT::_DOOR_CONTROL(-90456267, 105.7607, -746.646, 46.18266, false, 0.0, 0.0, 0.0);		// front
 		OBJECT::_DOOR_CONTROL(-2051651622, 127.8489, -760.4548, 45.90111, false, 0.0, 0.0, 0.0);	// internal
+		//Elevator doors
+		OBJECT::_DOOR_CONTROL(-1225363909, 134.9403, -762.9027, 44.75291, false, 0.0, 0.0, 0.0);	// internal
+		OBJECT::_DOOR_CONTROL(1219957182, 137.7594, -763.9288, 44.75291, false, 0.0, 0.0, 0.0);		// internal
+		OBJECT::_DOOR_CONTROL(-1225363909, 127.8489, -760.4548, 45.90111, false, 0.0, 0.0, 0.0);	// internal
+		OBJECT::_DOOR_CONTROL(1219957182, 139.1689, -764.4418, 44.75182, false, 0.0, 0.0, 0.0);		// internal
 	}
 	else
 	{
-		UnloadIPL("FIBlobby");
-		UnloadIPL("FIBlobby_lod");
-		LoadIPL("FIBlobbyfake");
-		LoadIPL("FIBlobbyfake_lod");
+		UnloadIPL("fiblobby");
+		UnloadIPL("fiblobby_lod");
+		LoadIPL("fiblobbyfake");
+		LoadIPL("fiblobbyfake_lod");
 	}
 	return;
 }
@@ -359,19 +377,23 @@ void CluckingBell()
 
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -71.0, 6266.0, 32.0) < distance)
 	{
-		UnloadIPL("CS1_02_cf_offmission");
-		LoadIPL("CS1_02_cf_onmission1");
-		LoadIPL("CS1_02_cf_onmission2");
-		LoadIPL("CS1_02_cf_onmission3");
-		LoadIPL("CS1_02_cf_onmission4");
+		UnloadIPL("cs1_02_cf_offmission");
+		UnloadIPL("cs1_02_cf_offmission_lod");
+		LoadIPL("cs1_02_cf_onmission1");
+		LoadIPL("cs1_02_cf_onmission1_lod");
+		LoadIPL("cs1_02_cf_onmission2");
+		LoadIPL("cs1_02_cf_onmission3");
+		LoadIPL("cs1_02_cf_onmission3_lod");
+		LoadIPL("cs1_02_cf_onmission4");
+		LoadIPL("cs1_02_cf_onmission4_lod");
 	}
 	else
 	{
-		UnloadIPL("CS1_02_cf_onmission1");
-		UnloadIPL("CS1_02_cf_onmission2");
-		UnloadIPL("CS1_02_cf_onmission3");
-		UnloadIPL("CS1_02_cf_onmission4");
-		LoadIPL("CS1_02_cf_offmission");
+		UnloadIPL("cs1_02_cf_onmission1");
+		UnloadIPL("cs1_02_cf_onmission2");
+		UnloadIPL("cs1_02_cf_onmission3");
+		UnloadIPL("cs1_02_cf_onmission4");
+		LoadIPL("cs1_02_cf_offmission");
 	}
 	return;
 }
@@ -437,13 +459,20 @@ void JanitorHouse()
 //O'Neil Ranch
 void ONeilRanch()
 {
-	if (!iniONeilRanch || STREAMING::IS_IPL_ACTIVE("farm_burnt") || STREAMING::IS_IPL_ACTIVE("des_farmhs_endimap"))
+	if (!iniONeilRanch || (iniStoryCompatibility && (STREAMING::IS_IPL_ACTIVE("farm_burnt") || STREAMING::IS_IPL_ACTIVE("des_farmhs_endimap"))))
+	{
+		UnloadIPL("farmint_cap");
+		UnloadIPL("farmint_cap_lod");
 		return;
+	}
 
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 2445.0, 4976.0, 50.0) < distance)
 	{
 		UnloadIPL("farmint_cap");
 		UnloadIPL("farmint_cap_lod");
+		UnloadIPL("farm_burnt");
+		UnloadIPL("farm_burnt_props");
+		UnloadIPL("des_farmhs_endimap");
 		LoadIPL("farm");
 		LoadIPL("farmint");
 		LoadIPL("farm_lod");
@@ -498,8 +527,10 @@ void HumaneLab()
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 3625.0, 3750.0, 28.0) < distance)
 	{
 		LoadIPL("v_lab");
-		OBJECT::_DOOR_CONTROL(-1081024910, 3620.843, 3751.527, 27.69009, false, 0.0, 0.0, -1.0);		// front
+		OBJECT::_DOOR_CONTROL(-1081024910, 3620.843, 3751.527, 27.69009, false, 0.0, 0.0, -1.0);	// front
 		OBJECT::_DOOR_CONTROL(-1081024910, 3627.713, 3746.716, 27.69009, false, 0.0, 0.0, -1.0);	// front
+		//Underwater entrance at the cooling tunnels
+		UnloadIPL("chemgrill_grp1");
 	}
 	else
 	{
@@ -568,11 +599,18 @@ void DignityYacht()
 //SS Bulker Container Ship
 void ContainerShip()
 {
-	if (!iniContainerShip || STREAMING::IS_IPL_ACTIVE("sunkcargoship") || STREAMING::IS_IPL_ACTIVE("SUNK_SHIP_FIRE"))
+	if (!iniContainerShip || (iniStoryCompatibility && STREAMING::IS_IPL_ACTIVE("sunkcargoship")))
+	{
+		UnloadIPL("cargoship");
+		UnloadIPL("cargoship_lod");
 		return;
+	}
 
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -228.0, -2366.0, 17.0) < 250000.0)
 	{
+		UnloadIPL("sunkcargoship");
+		UnloadIPL("sunkcargoship_lod");
+		UnloadIPL("sunk_ship_fire");
 		LoadIPL("cargoship");
 		LoadIPL("cargoship_lod");
 	}
@@ -732,16 +770,6 @@ void PoliceStationRooms()
 	return;
 }
 
-//Garage Near Union Depository
-void GarageNearUD()
-{
-	if (!iniGarageNearUD)
-		return;
-
-	AltUnlockDoor(-190780785, -33.80561, -621.6387, 36.06102);	// front
-	return;
-}
-
 //North Yankton Surveillance Room
 void YanktonSurveillance()
 {
@@ -763,6 +791,44 @@ void PacificBankVault()
 		OBJECT::_DOOR_CONTROL(1956494919, 266.3624, 217.5697, 110.4328, false, 0.0, 0.0, 0.0);	// internal
 		OBJECT::_DOOR_CONTROL(-1246222793, 256.3116, 220.6579, 106.4296, false, 0.0, 0.0, 0.0);	// internal
 	}
+	return;
+}
+
+//Garage Near Union Depository
+void GarageNearUD()
+{
+	if (!iniGarageNearUD)
+		return;
+
+	AltUnlockDoor(-190780785, -33.80561, -621.6387, 36.06102);	// front
+	return;
+}
+
+//Misc - Pier 400
+void PierGates()
+{
+	if (!iniPierGates)
+		return;
+
+	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -150.0, -2550.0, 5.0) < distance)
+	{
+		OBJECT::_DOOR_CONTROL(1286392437, 19.4045, -2529.702, 5.047173, false, 0.0, 0.0, 0.0);		// external
+		OBJECT::_DOOR_CONTROL(1286392437, 10.64414, -2542.213, 5.047173, false, 0.0, 0.0, 0.0);		// external
+		OBJECT::_DOOR_CONTROL(1286392437, -202.6151, -2515.309, 5.047173, false, 0.0, 0.0, 0.0);	// external
+		OBJECT::_DOOR_CONTROL(1286392437, -187.3406, -2515.309, 5.047173, false, 0.0, 0.0, 0.0);	// external
+		OBJECT::_DOOR_CONTROL(569833973, -160.8777, -2636.198, 5.025181, false, 0.0, 0.0, 0.0);		// external
+		OBJECT::_DOOR_CONTROL(569833973, -148.7143, -2636.198, 5.032078, false, 0.0, 0.0, 0.0);		// external
+	}
+	return;
+}
+
+//Garage in front of "Alpha Mail Couriers"
+void GarageNearAMC()
+{
+	if (!iniGarageNearAMC)
+		return;
+
+	OBJECT::_DOOR_CONTROL(-190780785, 1204.555, -3110.386, 6.557831, false, 0.0, 0.0, 0.0);		// external
 	return;
 }
 
@@ -827,8 +893,9 @@ void ScenarioGroups()
 	//Ammunations NPCs: Chumash, Del Perro, Great Chaparral, Hawick, La Mesa, Little Seoul, Pillbox Hill, Sandy Shores
 	SetScenarioGroup("ammunation", true);
 
-	//Countryside Banks NPCs: Great Ocean Highway and Route 68 Fleeca Banks
+	//Fleeca Banks NPCs
 	SetScenarioGroup("countryside_banks", true);
+	SetScenarioGroup("city_banks", true);
 
 	//Fort Zancudo Guards
 	SetScenarioGroup("fort_zancudo_guards", true);
@@ -889,6 +956,13 @@ void UnlockDoors()
 		OBJECT::_SET_DOOR_ACCELERATION_LIMIT(doorHash, 0, false, false);
 		OBJECT::DOOR_SYSTEM_SET_AUTOMATIC_RATE(doorHash, 1.0, false, false);
 		OBJECT::DOOR_SYSTEM_SET_AUTOMATIC_DISTANCE(doorHash, 15.15, false, false);
+	}
+
+	//Vangelico Jewelry Store doors
+	if (iniVangelico && !(iniStoryCompatibility && STREAMING::IS_IPL_ACTIVE("bh1_16_refurb")) && SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -630.0, -238.0, 38.0) < distance)
+	{
+		OBJECT::_DOOR_CONTROL(9467943, -630.4265, -238.4375, 38.20653, false, 0.0, 0.0, 0.0);
+		OBJECT::_DOOR_CONTROL(1425919976, -631.9554, -236.3333, 38.20653, false, 0.0, 0.0, 0.0);
 	}
 
 	//Chopshop

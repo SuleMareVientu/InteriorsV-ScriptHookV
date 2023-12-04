@@ -55,9 +55,11 @@ static void update()
 	PaletoSheriffOffice();
 	SandySheriffOffice();
 	PoliceStationRooms();
-	GarageNearUD();
 	YanktonSurveillance();
 	PacificBankVault();
+	GarageNearUD();
+	PierGates();
+	GarageNearAMC();
 	FleecaBanks();
 
 	//Scenario Groups
@@ -72,6 +74,7 @@ void ScriptMain()
 {
 	ReadINI();
 	AddBlips();
+
 	SYSTEM::SETTIMERA(0);
 	while (true)
 	{

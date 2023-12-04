@@ -9,6 +9,7 @@ extern float distance;
 //////////////////////////////////////INI Settings//////////////////////////////////////
 //General Settings
 extern bool iniBlips;
+extern bool iniStoryCompatibility;
 extern bool iniSafehouses;
 extern bool iniMissionInteriors;
 extern bool iniUnusedInteriors;
@@ -50,9 +51,11 @@ extern bool iniSlaughterhouse;
 extern bool iniPaletoSheriffOffice;
 extern bool iniSandySheriffOffice;
 extern bool iniPoliceStationRooms;
-extern bool iniGarageNearUD;
 extern bool iniYanktonSurveillance;
 extern bool iniPacificBankVault;
+extern bool iniGarageNearUD;
+extern bool iniPierGates;
+extern bool iniGarageNearAMC;
 extern bool iniFleecaBanks;
 
 //Extras
