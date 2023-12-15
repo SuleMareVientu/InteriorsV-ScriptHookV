@@ -14,7 +14,7 @@ void Lifeinvader();
 void FloydHouse();
 void Vangelico();
 void MaxRenda();
-void FIBLobby();
+void FIB();
 void Chopshop();
 void TequiLaLa();
 void FameorShame();
@@ -31,9 +31,11 @@ void DignityYacht();
 void ContainerShip();
 void UnionDepositoryVault();
 void UnionDepositoryParking();
-void MerryweatherDock();
-void StripclubBackDoor();
 void Slaughterhouse();
+void SolomonOffice();
+void Methlab();
+void Morgue();
+void Motel();
 
 //Unused Interiors
 void PaletoSheriffOffice();
@@ -41,10 +43,10 @@ void SandySheriffOffice();
 void PoliceStationRooms();
 void YanktonSurveillance();
 void PacificBankVault();
-void GarageNearUD();
-void PierGates();
-void GarageNearAMC();
 void FleecaBanks();
+
+//Misc Interiors
+void Misc();
 
 //Scenario Groups
 void ScenarioGroups();

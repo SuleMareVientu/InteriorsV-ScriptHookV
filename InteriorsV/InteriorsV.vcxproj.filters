@@ -16,6 +16,9 @@
     <ClCompile Include="source\utils\blips.cpp">
       <Filter>utils</Filter>
     </ClCompile>
+    <ClCompile Include="source\utils\onlineteleports.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\script.h" />
@@ -29,6 +32,9 @@
       <Filter>utils</Filter>
     </ClInclude>
     <ClInclude Include="source\utils\blips.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utils\onlineteleports.h">
       <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>

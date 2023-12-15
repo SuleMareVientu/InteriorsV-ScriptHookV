@@ -1,6 +1,6 @@
 //ScriptHook
 #include <natives.h>
-#include <types.h>
+// #include <types.h> //Already included in globals.h
 #include <main.h>
 //Custom
 #include "script.h"
@@ -8,11 +8,16 @@
 #include "utils\ini.h"
 #include "utils\blips.h"
 #include "utils\interiors.h"
+#include "utils\onlineteleports.h"
 
-Vector3 playerLoc;
+Ped playerPed = NULL;
+Vector3 playerLoc{NULL, NULL, NULL, NULL, NULL, NULL};
+bool missionFlag = NULL;
 
-static void update()
+void update()
 {
+	playerLoc = ENTITY::GET_ENTITY_COORDS(playerPed, false);
+
 	//Prints current interior ID
 	//Print(ToString(INTERIOR::GET_INTERIOR_AT_COORDS(playerLoc.x, playerLoc.y, playerLoc.z)), 5000);
 
@@ -30,7 +35,7 @@ static void update()
 	FloydHouse();
 	Vangelico();
 	MaxRenda();
-	FIBLobby();
+	FIB();
 	Chopshop();
 	TequiLaLa();
 	FameorShame();
@@ -47,9 +52,11 @@ static void update()
 	ContainerShip();
 	UnionDepositoryVault();
 	UnionDepositoryParking();
-	MerryweatherDock();
-	StripclubBackDoor();
 	Slaughterhouse();
+	SolomonOffice();
+	Methlab();
+	Morgue();
+	Motel();
 
 	//Unused Interiors
 	PaletoSheriffOffice();
@@ -57,10 +64,10 @@ static void update()
 	PoliceStationRooms();
 	YanktonSurveillance();
 	PacificBankVault();
-	GarageNearUD();
-	PierGates();
-	GarageNearAMC();
 	FleecaBanks();
+
+	//Misc Interiors
+	Misc();
 
 	//Scenario Groups
 	ScenarioGroups();
@@ -73,24 +80,41 @@ static void update()
 void ScriptMain()
 {
 	ReadINI();
-	AddBlips();
-
 	SYSTEM::SETTIMERA(0);
 	while (true)
 	{
+		playerPed = PLAYER::PLAYER_PED_ID();
+		missionFlag = MISC::GET_MISSION_FLAG();
+		
 		//Check if player exists
-		if (ENTITY::DOES_ENTITY_EXIST(PLAYER::PLAYER_PED_ID()))
+		if (!ENTITY::DOES_ENTITY_EXIST(playerPed))
+			return;
+
+		//Updates 1 time every 5 seconds
+		if (SYSTEM::TIMERA() > 5000)
 		{
-			playerLoc = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
-			//Updates 1 time every 5 seconds
-			if (SYSTEM::TIMERA() > 5000)
-			{
-				SYSTEM::SETTIMERA(0);
-				update();
-			}
-			else
-				UnlockDoors();	//These doors need to be unlocked every frame
+			SYSTEM::SETTIMERA(0);
+			update();
+			AddBlips();
 		}
+		else
+		{
+			playerLoc = ENTITY::GET_ENTITY_COORDS(playerPed, false);
+			UnlockDoors();	//These doors need to be unlocked every frame
+		}
+
+		//Blips toggle. Default Key: F3 (https://docs.fivem.net/docs/game-references/controls/)
+		if (PAD::IS_DISABLED_CONTROL_JUST_PRESSED(2, 170))
+		{
+			if (iniBlips)
+				RemoveBlips();
+			else
+			{
+				iniBlips = true;
+				AddBlips();
+			}
+		}
+		Teleports();
 		WAIT(0);
 	}
 	return;
