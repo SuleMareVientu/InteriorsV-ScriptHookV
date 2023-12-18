@@ -7,8 +7,13 @@ extern Vector3 playerLoc;
 extern bool missionFlag;
 extern Hash doorHash;
 extern float distance;
+extern bool isInsideApartment;
 
 //////////////////////////////////////INI Settings//////////////////////////////////////
+
+//Keys
+extern DWORD iniToggleBlips;
+
 //General Settings
 extern bool iniBlips;
 extern bool iniBlipsOnlineApartments;

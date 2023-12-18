@@ -351,7 +351,10 @@ void Chopshop()
 		}
 	}
 	else
+	{
+		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(480.5f, -1319.0f, 30.0f));
 		UnloadIPL("v_chopshop");
+	}
 
 	return;
 }
@@ -370,7 +373,10 @@ void TequiLaLa()
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(993120320, -561.2866f, 293.5044f, 87.77851f, false, 0.0f, 0.0f, 0.0f);	// rear (v_ilev_roc_door4)
 	}
 	else
+	{
+		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-565.0f, 276.5f, 83.5f));
 		UnloadIPL("v_rockclub");
+	}
 
 	return;
 }
@@ -443,7 +449,10 @@ void Foundry()
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1428622127, 1085.307f, -2018.561f, 41.62894f, false, 0.0f, 0.0f, 0.0f);	// rear (prop_ron_door_01)
 	}
 	else
+	{
+		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(1089.5f, -1995.5f, 33.0f));
 		UnloadIPL("v_foundry");
+	}
 
 	return;
 }
@@ -461,7 +470,10 @@ void EpsilonRoom()
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1230442770, 241.3621f, 361.0471f, 105.8883f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_epsstoredoor)
 	}
 	else
+	{
+		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(245.5f, 370.0f, 106.3f));
 		UnloadIPL("v_epsilonism");
+	}
 
 	return;
 }
@@ -529,9 +541,7 @@ void Scrapyard()
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -605.0f, -1615.0f, 27.0f) < distance)
 	{
 		LoadIPL("v_recycle");
-		int v_recycle = INTERIOR::GET_INTERIOR_AT_COORDS(-611.4f, -1615.7f, 29.2f);
-		EnableInterior(v_recycle);
-		INTERIOR::UNPIN_INTERIOR(v_recycle);
+		EnableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-611.4f, -1615.7f, 29.2f));
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1099436502, -608.7289f, -1610.315f, 27.15894f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_rc_door3_l)
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1627599682, -611.32f, -1610.089f, 27.15894f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_rc_door3_r)
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1099436502, -592.9376f, -1631.577f, 27.15931f, false, 0.0f, 0.0f, 0.0f);	// rear (v_ilev_rc_door3_l)
@@ -540,7 +550,10 @@ void Scrapyard()
 		DeleteObjectAtCoords(812467272, -590.8198f, -1621.436f, 33.16059f);		// internal (v_ilev_rc_door1_st)
 	}
 	else
+	{
+		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-611.4f, -1615.7f, 29.2f));
 		UnloadIPL("v_recycle");
+	}
 
 	return;
 }
@@ -675,7 +688,7 @@ void UnionDepositoryVault()
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1011692606, 8.171528f, -672.4393f, 16.35861f, true, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fingate)
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1011692606, -3.58445f, -668.1644f, 16.35861f, true, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fingate)
 	}
-	else
+	else if (!missionFlag)
 		UnloadIPL("FINBANK");
 
 	return;
@@ -695,6 +708,7 @@ void UnionDepositoryParking()
 	}
 	else
 	{
+		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-16.0f, -685.00f, 34.0f));
 		UnloadIPL("dt1_03_carpark");
 		LoadIPL("dt1_03_shutter");
 	}
@@ -717,7 +731,10 @@ void Slaughterhouse()
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1468417022, 962.9085f, -2105.813f, 34.20225f, true, 0.0f, 0.0f, 1.0f);	// rear (prop_abat_slide)
 	}
 	else
+	{
+		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(981.0f, -2186.0f, 32.1f));
 		UnloadIPL("v_abattoir");
+	}
 
 	return;
 }
@@ -736,7 +753,11 @@ void SolomonOffice()
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2030220382, -1002.147f, -478.0642f, 50.11668f, true, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_sol_off_door01)
 	}
 	else
+	{
+		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-1007.14f, -478.53f, 51.57f));
 		UnloadIPL("v_58_sol_office");
+	}
+
 	return;
 }
 
@@ -769,6 +790,7 @@ void Morgue()
 	}
 	else
 	{
+		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(275.446f, -1361.11f, 24.5378f));
 		UnloadIPL("coroner_int_on");
 		UnloadIPL("coronertrash");
 		LoadIPL("coroner_int_off");
@@ -806,13 +828,13 @@ void PaletoSheriffOffice()
 	{
 		UnloadIPL("cs1_16_sheriff_cap");
 		LoadIPL("v_sheriff2");
-		int v_sheriff2 = INTERIOR::GET_INTERIOR_AT_COORDS(-447.0f, 6013.5f, 32.3f);
-		EnableInterior(v_sheriff2);
+		EnableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-447.0f, 6013.5f, 32.3f));
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1501157055, -444.4985f, 6017.06f, 31.86633f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_shrf2door)
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1501157055, -442.66f, 6015.222f, 31.86633f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_shrf2door)
 	}
 	else
 	{
+		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-447.0f, 6013.5f, 32.3f));
 		UnloadIPL("v_sheriff2");
 		LoadIPL("cs1_16_sheriff_cap");
 	}
@@ -829,12 +851,12 @@ void SandySheriffOffice()
 	{
 		UnloadIPL("sheriff_cap");
 		LoadIPL("v_sheriff");
-		int v_sheriff = INTERIOR::GET_INTERIOR_AT_COORDS(1853.0f, 3688.0f, 35.0f);
-		EnableInterior(v_sheriff);
+		EnableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(1853.0f, 3688.0f, 35.0f));
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1765048490, 1855.685f, 3683.93f, 34.59282f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_shrfdoor)
 	}
 	else
 	{
+		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(1853.0f, 3688.0f, 35.0f));
 		UnloadIPL("v_sheriff");
 		LoadIPL("sheriff_cap");
 	}
@@ -945,7 +967,6 @@ void Misc()
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1286392437, 492.2758f, -3115.934f, 5.162354f, false, 0.0f, 0.0f, 0.0f);	// internal (prop_gate_docks_ld)
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1286392437, 476.3276f, -3115.925f, 5.162354f, false, 0.0f, 0.0f, 0.0f);	// internal (prop_gate_docks_ld)
 	}
-	return;
 
 	//Vanilla Unicorn Back Door
 	OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(668467214, 96.09197f, -1284.854f, 29.43878f, false, 0.0f, 0.0f, 0.0f);		// internal (prop_magenta_door)

@@ -6,6 +6,8 @@
 #include "../globals.h"
 #include "onlineteleports.h"
 
+bool isInsideApartment = false;
+
 //Yellow HUD Color
 static const int R = 240;
 static const int G = 200;
@@ -90,33 +92,136 @@ static void EnableHighEndApartment(float x, float y, float z)
 
 static void HighEndApartments()
 {
+	//Eclipse Towers, Apt 31
+	Teleport(-774.1730f, 333.5828f, 206.6216f, 0.0f, 180.0f, -777.3174f, 312.8665f, 84.6982f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 31.", exitMsg, false);
+	
+	//Eclipse Towers, Apt 40
+	Teleport(-781.9239f, 323.6453, 222.2577, -180.0f, 180.0f, -775.0563f, 312.8823f, 84.6982f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 40.", exitMsg, false);
+	
+	//Eclipse Towers, Apt 5
+	Teleport(-774.6435f, 334.0733f, 159.0025f, 0.0f, 180.0f, -772.7392f, 312.8988f, 84.6982f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 5.", exitMsg, false);
+		
+	//Eclipse Towers, Apt 9
+	Teleport(-781.8421f, 323.5967f, 175.7937f, -180.0f, 180.0f, -770.5235f, 312.8487f, 84.6982f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 9.", exitMsg, false);
+
+	//Weazel Plaza, Apt 101
+	Teleport(-906.4988f, -455.8776f, 125.5245f, -150.0f, 115.0f, -916.5256f, -450.6372f, 38.5999f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 101.", exitMsg, false);
+
+	//Weazel Plaza, Apt 70
+	Teleport(-891.8675f, -434.3725f, 120.6071f, 25.0f, 115.0f, -915.3770f, -452.9363f, 38.5999f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 70.", exitMsg, false);
+
+	//Weazel Plaza, Apt 26
+	Teleport(-888.4596f, -451.6940f, 94.4611f, -70.0f, 115.0f, -914.2271f, -455.1444f, 38.5999f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 26.", exitMsg, false);
+
+	//Tinsel Towers, Apt 29
+	Teleport(-604.9368f, 48.5689f, 92.6262f, 180.0f, -180.0f, -616.9627f, 37.4050f, 42.5870f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 29.", exitMsg, false);
+
+	//Tinsel Towers, Apt 45
+	Teleport(-596.4171f, 58.8616f, 107.0271f, 0.0f, -180.0f, -619.2788f, 37.3939f, 42.5871f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 45.", exitMsg, false);
+
+	//Richards Majestic, Apt 51
+	Teleport(-908.3109f, -370.2491f, 108.4403f, 35.0f, 115.0f, -937.5001f, -376.2820f, 37.9613f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 51.", exitMsg, false);
+
+	//Richards Majestic, Apt. 4
+	Teleport(-921.7794f, -380.9352f, 84.4805f, -150.0f, 115.0f, -934.8232f, -381.5349f, 37.9613f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 4.", exitMsg, false);
+
+	//4 Integrity Way, Apt. 35
+	Teleport(-22.9808f, -608.2526f, 99.2329f, -110.0f, 70.0f, -47.0121f, -584.5853f, 36.9580f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 35.", exitMsg, false);
+
+	//4 Integrity Way, Apt. 30
+	Teleport(-17.5179f, -588.9467f, 89.1149f, -25.0f, 70.0f, -47.9679f, -587.2177f, 36.9580f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 30.", exitMsg, false);
+
+	//3 Alta Street Tower, Apt 57
+	Teleport(-272.4795f, -940.1398f, 91.5109f, 70.0f, -170.0f, -262.5153f, -971.1097f, 30.2198f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 57.", exitMsg, false);
+
+	//3 Alta Street Tower, Apt 10
+	Teleport(-270.7699f, -968.1721f, 76.2314f, -110.0f, -145.0f, -260.8047f, -970.3950f, 30.2200f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 10.", exitMsg, false);
+
+	//Del Perro Heights, Apt 20
+	Teleport(-1451.538f, -523.6300f, 68.5566f, 40.0f, -150.0f, -1443.0387f, -545.7762f, 33.7418f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 20.", exitMsg, false);
+
+	//Del Perro Heights, Apt 7
+	Teleport(-1451.538f, -523.6300f, 55.9290f, 40.0f, -150.0f, -1442.0504f, -545.0800f, 33.7418f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 7.", exitMsg, false);
+	
+	return;
+}
+
+void HighEndApartmentsCulling()
+{
 	//Model culling works only for SPmap, this is NOT made for the MPmap
 	//Original model names can be found inside am_mp_property_int.c
-	int currentInterior = INTERIOR::GET_INTERIOR_FROM_ENTITY(playerPed);
+	
+	int currentInterior = INTERIOR::GET_INTERIOR_AT_COORDS(playerLoc.x, playerLoc.y, playerLoc.z);
+	if (!isInsideApartment || currentInterior == 0)
+	{
+		isInsideApartment = false;
 
-	//Eclipse Towers, Apt 31
-	if (Teleport(-774.1730f, 333.5828f, 206.6216f, 0.0f, 180.0f, -777.3174f, 312.8665f, 84.6982f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 31.", exitMsg, false))
-		EnableHighEndApartment(-797.5f, 335.31f, 207.29f);
+		//Eclipse Towers Apartments
+		if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -777.3174f, 312.8665f, 84.6982f) < distance)
+		{
+			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-797.5f, 335.31f, 207.29f));
+			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-755.5f, 318.52f, 222.61f));
+			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-801.29f, 336.86f, 159.42f));
+			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-758.99f, 319.74f, 175.97f));
+		}
 
-	//Eclipse Towers, Apt 40
-	if (Teleport(-781.9239f, 323.6453, 222.2577, -180.0f, 180.0f, -775.0563f, 312.8823f, 84.6982f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 40.", exitMsg, false))
-		EnableHighEndApartment(-755.5f, 318.52f, 222.61f);
+		//Weazel Plaza Apartments
+		if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -916.5256f, -450.6372f, 38.5999f) < distance)
+		{
+			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-889.31f, -450.9f, 126.21f));
+			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-906.66f, -439.15f, 121.21f));
+			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-891.68f, -434.44f, 95.98f));
+		}
 
-	//Eclipse Towers, Apt 5
-	if (Teleport(-774.6435f, 334.0733f, 159.0025f, 0.0f, 180.0f, -772.7392f, 312.8988f, 84.6982f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 5.", exitMsg, false))
-		EnableHighEndApartment(-801.29f, 336.86f, 159.42f);
+		//Tinsel Towers Apartments
+		if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -616.9627f, 37.4050f, 42.5870f) < distance)
+		{
+			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-586.9371f, 46.5519f, 92.2204f));
+			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-617.6090f, 63.0240f, 106.6243f));
+		}
 
-	//Eclipse Towers, Apt 9
-	if (Teleport(-781.8421f, 323.5967f, 175.7937f, -180.0f, 180.0f, -770.5235f, 312.8487f, 84.6982f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 9.", exitMsg, false))
-		EnableHighEndApartment(-758.99f, 319.74f, 175.97f);
+		//Richards Majestic
+		if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -937.5001f, -376.2820f, 37.9613f) < distance)
+		{
+			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-929.0226f, -379.9931f, 108.03774f));
+			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-905.5511f, -375.1243f, 84.0079f));
+		}
+
+		//4 Integrity Way Apartments
+		if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -47.9679f, -587.2177f, 36.9580f) < distance)
+		{
+			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-15.0248f, -590.8832f, 98.8302f));
+			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-36.1545f, -581.2134f, 88.7091f));
+		}
+
+		//3 Alta Street Tower Apartments
+		if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -262.5153f, -971.1097f, 30.2198f) < distance)
+		{
+			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-272.4795f, -940.1398f, 91.5109f));
+			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-270.7699f, -968.1721f, 76.2314f));
+		}
+
+		//Del Perro Heights Apartments
+		if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -1442.0504f, -545.0800f, 33.7418f) < distance)
+		{
+			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-1451.538f, -523.6300f, 68.5566f));
+			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-1451.538f, -523.6300f, 55.9290f));
+		}
+		return;
+	}
 
 	//Eclipse Towers Apartments culling
-	if (currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-797.5f, 335.31f, 207.29f)	||	//Eclipse Towers, Apt 31
+	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -777.3174f, 312.8665f, 84.6982f) < distance &&
+		(currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-797.5f, 335.31f, 207.29f) ||	//Eclipse Towers, Apt 31
 		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-755.5f, 318.52f, 222.61f)	||	//Eclipse Towers, Apt 40
-		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-801.29f, 336.86f, 159.42f)	||	//Eclipse Towers, Apt 5
-		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-758.99f, 319.74f, 175.97f)		//Eclipse Towers, Apt 9
-	   )
+		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-801.29f, 336.86f, 159.42f) ||	//Eclipse Towers, Apt 5
+		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-758.99f, 319.74f, 175.97f))	//Eclipse Towers, Apt 9
+		)
 	{
+		EnableHighEndApartment(-797.5f, 335.31f, 207.29f);
+		EnableHighEndApartment(-755.5f, 318.52f, 222.61f);
+		EnableHighEndApartment(-801.29f, 336.86f, 159.42f);
+		EnableHighEndApartment(-758.99f, 319.74f, 175.97f);
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(1590383694);	//ss1_11_flats
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-1799920002);	//ss1_11_ss1_emissive_a
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(651180941);		//ss1_11_detail01b
@@ -131,24 +236,16 @@ static void HighEndApartments()
 		DeleteScenarioPedAtCoords(-770.7636f, 323.2263f, 170.0934f, "PROP_HUMAN_SEAT_CHAIR");
 	}
 
-	//Weazel Plaza, Apt 101
-	if (Teleport(-906.4988f, -455.8776f, 125.5245f, -150.0f, 115.0f, -916.5256f, -450.6372f, 38.5999f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 101.", exitMsg, false))
-		EnableHighEndApartment(-889.31f, -450.9f, 126.21f);
-
-	//Weazel Plaza, Apt 70
-	if (Teleport(-891.8675f, -434.3725f, 120.6071f, 25.0f, 115.0f, -915.3770f, -452.9363f, 38.5999f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 70.", exitMsg, false))
-		EnableHighEndApartment(-906.66f, -439.15f, 121.21f);
-
-	//Weazel Plaza, Apt 26
-	if (Teleport(-888.4596f, -451.6940f, 94.4611f, -70.0f, 115.0f, -914.2271f, -455.1444f, 38.5999f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 26.", exitMsg, false))
-		EnableHighEndApartment(-891.68f, -434.44f, 95.98f);
-
 	//Weazel Plaza Apartments culling
-	if (currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-889.31f, -450.9f, 126.21f)		||	//Weazel Plaza, Apt 101
-		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-906.66f, -439.15f, 121.21f)	||	//Weazel Plaza, Apt 70
-		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-891.68f, -434.44f, 95.98f)			//Weazel Plaza, Apt 26
-	   )
+	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -916.5256f, -450.6372f, 38.5999f) < distance &&
+		(currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-889.31f, -450.9f, 126.21f) ||	//Weazel Plaza, Apt 101
+		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-906.66f, -439.15f, 121.21f) ||	//Weazel Plaza, Apt 70
+		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-891.68f, -434.44f, 95.98f))	//Weazel Plaza, Apt 26
+		)
 	{
+		EnableHighEndApartment(-889.31f, -450.9f, 126.21f);
+		EnableHighEndApartment(-906.66f, -439.15f, 121.21f);
+		EnableHighEndApartment(-891.68f, -434.44f, 95.98f);
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(1359069635);	//bh1_09_bld_01
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(41930611);		//bh1_09_ema
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-200410159);	//prop_wall_light_12a
@@ -158,19 +255,14 @@ static void HighEndApartments()
 		DeleteScenarioPedAtCoords(-893.1642f, -441.6309f, 88.7508f, "PROP_HUMAN_SEAT_CHAIR");
 	}
 
-	//Tinsel Towers, Apt 29
-	if (Teleport(-604.9368f, 48.5689f, 92.6262f, 180.0f, -180.0f, -616.9627f, 37.4050f, 42.5870f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 29.", exitMsg, false))
-		EnableHighEndApartment(-586.9371f, 46.5519f, 92.2204f);
-
-	//Tinsel Towers, Apt 45
-	if (Teleport(-596.4171f, 58.8616f, 107.0271f, 0.0f, -180.0f, -619.2788f, 37.3939f, 42.5871f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 45.", exitMsg, false))
-		EnableHighEndApartment(-617.6090f, 63.0240f, 106.6243f);
-
 	//Tinsel Towers Apartments culling
-	if (currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-586.9371f, 46.5519f, 92.2204f) ||	//Tinsel Towers, Apt 29
-		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-617.6090f, 63.0240f, 106.6243f)	//Tinsel Towers, Apt 45
-	   )
+	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -616.9627f, 37.4050f, 42.5870f) < distance &&
+		(currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-586.9371f, 46.5519f, 92.2204f) ||	//Tinsel Towers, Apt 29
+		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-617.6090f, 63.0240f, 106.6243f))	//Tinsel Towers, Apt 45
+		)
 	{
+		EnableHighEndApartment(-586.9371f, 46.5519f, 92.2204f);
+		EnableHighEndApartment(-617.6090f, 63.0240f, 106.6243f);
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-1426709080);	//ss1_02_building01
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(253211729);		//SS1_Emissive_SS1_02a_LOD
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-500045280);	//ss1_02_ss1_emissive_ss1_02
@@ -179,19 +271,14 @@ static void HighEndApartments()
 		DeleteScenarioPedAtCoords(-593.8669f, 48.3100f, 86.9158f, "PROP_HUMAN_SEAT_CHAIR");
 	}
 
-	//Richards Majestic, Apt 51
-	if (Teleport(-908.3109f, -370.2491f, 108.4403f, 35.0f, 115.0f, -937.5001f, -376.2820f, 37.9613f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 51.", exitMsg, false))
-		EnableHighEndApartment(-929.0226f, -379.9931f, 108.03774f);
-
-	//Richards Majestic, Apt. 4
-	if (Teleport(-921.7794f, -380.9352f, 84.4805f, -150.0f, 115.0f, -934.8232f, -381.5349f, 37.9613f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 4.", exitMsg, false))
-		EnableHighEndApartment(-905.5511f, -375.1243f, 84.0079f);
-
 	//Richards Majestic Apartments culling
-	if (currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-929.0226f, -379.9931f, 108.03774f)	||	//Richards Majestic, Apt 51
-		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-905.5511f, -375.1243f, 84.0079f)		//Richards Majestic, Apt. 4
-	   )
+	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -937.5001f, -376.2820f, 37.9613f) < distance &&
+		(currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-929.0226f, -379.9931f, 108.03774f) ||	//Richards Majestic, Apt 51
+		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-905.5511f, -375.1243f, 84.0079f))		//Richards Majestic, Apt. 4
+		)
 	{
+		EnableHighEndApartment(-929.0226f, -379.9931f, 108.03774f);
+		EnableHighEndApartment(-905.5511f, -375.1243f, 84.0079f);
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-952859393);	//bh1_08_bld2
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(935186440);		//bh1_emissive_bh1_08
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(1828238070);	//bh1_08_bld2_LOD
@@ -201,19 +288,14 @@ static void HighEndApartments()
 		DeleteScenarioPedAtCoords(-911.7831f, -376.1330f, 78.7702f, "PROP_HUMAN_SEAT_CHAIR");
 	}
 
-	//4 Integrity Way, Apt. 35
-	if (Teleport(-22.9808f, -608.2526f, 99.2329f, -155.0f, 70.0f, -47.0121f, -584.5853f, 36.9580f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 35.", exitMsg, false))
-		EnableHighEndApartment(-15.0248f, -590.8832f, 98.8302f);
-
-	//4 Integrity Way, Apt. 30
-	if (Teleport(-17.5179f, -588.9467f, 89.1149f, -25.0f, 70.0f, -47.9679f, -587.2177f, 36.9580f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 30.", exitMsg, false))
-		EnableHighEndApartment(-36.1545f, -581.2134f, 88.7091f);
-
 	//4 Integrity Way Apartments culling
-	if (currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-15.0248f, -590.8832f, 98.8302f) ||	//4 Integrity Way, Apt. 35
-		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-36.1545f, -581.2134f, 88.7091f)	//4 Integrity Way, Apt. 30
-	   )
+	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -47.9679f, -587.2177f, 36.9580f) < distance &&
+		(currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-15.0248f, -590.8832f, 98.8302f) ||	//4 Integrity Way, Apt. 35
+		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-36.1545f, -581.2134f, 88.7091f))		//4 Integrity Way, Apt. 30
+		)
 	{
+		EnableHighEndApartment(-15.0248f, -590.8832f, 98.8302f);
+		EnableHighEndApartment(-36.1545f, -581.2134f, 88.7091f);
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-180177302);	//dt1_03_build1x
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-1825769292);	//DT1_Emissive_DT1_03_b1
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-285026450);	//dt1_03_dt1_Emissive_b1
@@ -222,19 +304,14 @@ static void HighEndApartments()
 		DeleteScenarioPedAtCoords(-27.8779f, -584.8820f, 83.4045f, "PROP_HUMAN_SEAT_CHAIR");
 	}
 
-	//3 Alta Street Tower, Apt 57
-	if (Teleport(-272.4795f, -940.1398f, 91.5109f, 70.0f, -170.0f, -262.5153f, -971.1097f, 30.2198f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 57.", exitMsg, false))
-		EnableHighEndApartment(-272.4795f, -940.1398f, 91.5109f);
-
-	//3 Alta Street Tower, Apt 10
-	if (Teleport(-270.7699f, -968.1721f, 76.2314f, -110.0f, -145.0f, -260.8047f, -970.3950f, 30.2200f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 10.", exitMsg, false))
-		EnableHighEndApartment(-270.7699f, -968.1721f, 76.2314f);
-
 	//3 Alta Street Tower Apartments culling
-	if (currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-272.4795f, -940.1398f, 91.5109f) ||	//3 Alta Street Tower, Apt 57
-		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-270.7699f, -968.1721f, 76.2314f)		//3 Alta Street Tower, Apt 10
-	   )
+	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -262.5153f, -971.1097f, 30.2198f) < distance &&
+		(currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-272.4795f, -940.1398f, 91.5109f) ||	//3 Alta Street Tower, Apt 57
+		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-270.7699f, -968.1721f, 76.2314f))		//3 Alta Street Tower, Apt 10
+		)
 	{
+		EnableHighEndApartment(-272.4795f, -940.1398f, 91.5109f);
+		EnableHighEndApartment(-270.7699f, -968.1721f, 76.2314f);
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-1294038851);	//dt1_20_build2
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-312225717);	//dt1_20_dt1_emissive_dt1_20
 		GRAPHICS::DISABLE_OCCLUSION_THIS_FRAME();
@@ -242,26 +319,21 @@ static void HighEndApartments()
 		DeleteScenarioPedAtCoords(-266.7457f, -957.8518f, 70.5210f, "PROP_HUMAN_SEAT_CHAIR");
 	}
 
-	//Del Perro Heights, Apt 20
-	if (Teleport(-1451.538f, -523.6300f, 68.5566f, 40.0f, -150.0f, -1443.0387f, -545.7762f, 33.7418f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 20.", exitMsg, false))
-		EnableHighEndApartment(-1451.538f, -523.6300f, 68.5566f);
-
-	//Del Perro Heights, Apt 7
-	if (Teleport(-1451.538f, -523.6300f, 55.9290f, 40.0f, -150.0f, -1442.0504f, -545.0800f, 33.7418f, R, G, B, A, "Press ~INPUT_ENTER~ to enter apartment 7.", exitMsg, false))
-		EnableHighEndApartment(-1451.538f, -523.6300f, 55.9290f);
-
 	//Del Perro Heights Apartments culling
-	if (currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-1451.538f, -523.6300f, 68.5566f) ||	//Del Perro Heights, Apt 20
-		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-1451.538f, -523.6300f, 55.9290f)		//Del Perro Heights, Apt 7
-	   )
+	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -1442.0504f, -545.0800f, 33.7418f) < distance &&
+		(currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-1451.538f, -523.6300f, 68.5566f) ||	//Del Perro Heights, Apt 20
+		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-1451.538f, -523.6300f, 55.9290f))		//Del Perro Heights, Apt 7
+		)
 	{
+		EnableHighEndApartment(-1451.538f, -523.6300f, 68.5566f);
+		EnableHighEndApartment(-1451.538f, -523.6300f, 55.9290f);
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-160801422);	//sm_14_bld2
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-1969201018);	//sm_14_emissive
 		GRAPHICS::DISABLE_OCCLUSION_THIS_FRAME();
 		DeleteScenarioPedAtCoords(-1460.754f, -529.7892f, 62.8463f, "PROP_HUMAN_SEAT_CHAIR");
 		DeleteScenarioPedAtCoords(-1460.754f, -529.7892f, 50.2187f, "PROP_HUMAN_SEAT_CHAIR");
 	}
-	
+
 	return;
 }
 
@@ -277,7 +349,9 @@ void Teleports()
 
 	//High End Apartments
 	if (iniHighEndApartments)
+	{
+		HighEndApartmentsCulling();
 		HighEndApartments();
-
+	}
 	return;
 }

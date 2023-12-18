@@ -6,6 +6,7 @@
 #include "script.h"
 #include "globals.h"
 #include "utils\ini.h"
+#include "utils\keyboard.h"
 #include "utils\blips.h"
 #include "utils\interiors.h"
 #include "utils\onlineteleports.h"
@@ -103,8 +104,8 @@ void ScriptMain()
 			UnlockDoors();	//These doors need to be unlocked every frame
 		}
 
-		//Blips toggle. Default Key: F3 (https://docs.fivem.net/docs/game-references/controls/)
-		if (PAD::IS_DISABLED_CONTROL_JUST_PRESSED(2, 170))
+		//Blips toggle. Default Key: F3 (https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes)
+		if (IsKeyJustUp(iniToggleBlips))
 		{
 			if (iniBlips)
 				RemoveBlips();

@@ -3,6 +3,9 @@
 #include "../globals.h"
 #include "blips.h"
 
+//Keys
+DWORD iniToggleBlips = 0x72;	//F3
+
 //General Settings
 bool iniBlips = true;
 bool iniBlipsOnlineApartments = false;
@@ -73,6 +76,10 @@ void ReadINI()
 
 	if (res != SI_OK)
 		return;
+
+//////////////////////////////////////Keys//////////////////////////////////////
+	
+	iniToggleBlips = ini.GetLongValue("Keys", "ToggleBlips", 0x72);
 
 //////////////////////////////////////Settings//////////////////////////////////////
 

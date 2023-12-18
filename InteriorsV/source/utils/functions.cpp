@@ -5,11 +5,13 @@
 #include "functions.h"
 #include "../globals.h"
 #include "../script.h"
+#include "onlineteleports.h"
 
 Hash doorHash = NULL;
 
 static int lastTimer = 0;
 static float lastMarkerOutX = 0.0f;
+static float lastMarkerOutZ = 0.0f;
 static float markerStartX = 0.0f;
 static float markerStartY = 0.0f;
 static float markerStartZ = 0.0f;
@@ -79,6 +81,17 @@ void EnableInterior(int interior)
 		STREAMING::SET_INTERIOR_ACTIVE(interior, true);
 		INTERIOR::DISABLE_INTERIOR(interior, false);
 		INTERIOR::CAP_INTERIOR(interior, false);
+	}
+	return;
+}
+
+void DisableInterior(int interior)
+{
+	if (!INTERIOR::IS_INTERIOR_DISABLED(interior))
+	{
+		STREAMING::SET_INTERIOR_ACTIVE(interior, false);
+		INTERIOR::UNPIN_INTERIOR(interior);
+		INTERIOR::DISABLE_INTERIOR(interior, true);
 	}
 	return;
 }
@@ -225,10 +238,11 @@ bool Teleport(float x, float y, float z, float heading, float headingOut, float 
 		GRAPHICS::DRAW_MARKER(1, markerX, markerY, markerZ, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.75f, 0.75f, 0.75f, red, green, blue, alpha, false, false, 2, false, NULL, NULL, false);
 
 	//Check for overlap with other markers at same coords (low-end and medium apartments)
-	if (distanceEnd < distance && (lastTimer != SYSTEM::TIMERA() || (lastTimer == SYSTEM::TIMERA() && x != lastMarkerOutX)))
+	if (distanceEnd < distance && (lastTimer != SYSTEM::TIMERA() || (lastTimer == SYSTEM::TIMERA() && (x != lastMarkerOutX || z != lastMarkerOutZ))))
 	{
 		GRAPHICS::DRAW_MARKER(1, x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.75f, 0.75f, 0.75f, red, green, blue, alpha, false, false, 2, false, NULL, NULL, false);
 		lastMarkerOutX = x;
+		lastMarkerOutZ = z;
 		lastTimer = SYSTEM::TIMERA();
 	}
 
@@ -241,6 +255,7 @@ bool Teleport(float x, float y, float z, float heading, float headingOut, float 
 		PrintHelp(text);
 		if (PAD::IS_DISABLED_CONTROL_JUST_PRESSED(2, 23) && !CAM::IS_SCREEN_FADING_IN() && !CAM::IS_SCREEN_FADED_OUT())
 		{
+			isInsideApartment = true;
 			ENTITY::FREEZE_ENTITY_POSITION(playerPed, true);
 			CAM::DO_SCREEN_FADE_OUT(300);
 			while (!CAM::IS_SCREEN_FADED_OUT())
@@ -249,14 +264,20 @@ bool Teleport(float x, float y, float z, float heading, float headingOut, float 
 			}
 
 			ENTITY::SET_ENTITY_COORDS_NO_OFFSET(playerPed, x, y, z, false, false, false);
+			playerLoc = { x, playerLoc._paddingx , y, playerLoc._paddingy, z, playerLoc._paddingz };
 			ENTITY::SET_ENTITY_HEADING(playerPed, heading);
 			CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(0.0f);
 			CAM::SET_GAMEPLAY_CAM_RELATIVE_PITCH(0.0f, 0.0f);
 			
 			//Asset streaming check
 			update();
+			HighEndApartmentsCulling();
 			int interior = INTERIOR::GET_INTERIOR_AT_COORDS(x, y, z);
-			if (interior != 0)
+			//Compatibility with 4 Integrity Way apartments and Union Depository
+			if (interior != 0 &&
+				interior != INTERIOR::GET_INTERIOR_AT_COORDS(-47.0121f, -584.5853f, 36.9580f)	&&	//4 Integrity Way apartments
+				interior != INTERIOR::GET_INTERIOR_AT_COORDS(-0.1434f, -705.9488f, 15.1312f)		//Union Depository Vault
+				)
 			{
 				while (INTERIOR::IS_VALID_INTERIOR(interior) && !INTERIOR::IS_INTERIOR_READY(interior))
 				{
@@ -292,6 +313,7 @@ bool Teleport(float x, float y, float z, float heading, float headingOut, float 
 				headingOut = headingStartGlobal;
 			}
 
+			isInsideApartment = false;
 			ENTITY::FREEZE_ENTITY_POSITION(playerPed, true);
 			CAM::DO_SCREEN_FADE_OUT(300);
 			while (!CAM::IS_SCREEN_FADED_OUT())
@@ -300,14 +322,19 @@ bool Teleport(float x, float y, float z, float heading, float headingOut, float 
 			}
 
 			ENTITY::SET_ENTITY_COORDS_NO_OFFSET(playerPed, markerX, markerY, markerZ, false, false, false);
+			playerLoc = { markerX, playerLoc._paddingx , markerY, playerLoc._paddingy, markerZ, playerLoc._paddingz };
 			ENTITY::SET_ENTITY_HEADING(playerPed, headingOut);
 			CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(0.0f);
 			CAM::SET_GAMEPLAY_CAM_RELATIVE_PITCH(0.0f, 0.0f);
 			
 			//Asset streaming check
 			update();
+			//Compatibility with 4 Integrity Way apartments and Union Depository
 			int interior = INTERIOR::GET_INTERIOR_AT_COORDS(markerX, markerY, markerZ);
-			if (interior != 0)
+			if (interior != 0 && 
+				interior != INTERIOR::GET_INTERIOR_AT_COORDS(-47.0121f, -584.5853f, 36.9580f)	&&	//4 Integrity Way apartments
+				interior != INTERIOR::GET_INTERIOR_AT_COORDS(10.3384f, -671.1154f, 32.4495f)		//Union Depository Parking
+				)
 			{
 				while (INTERIOR::IS_VALID_INTERIOR(interior) && !INTERIOR::IS_INTERIOR_READY(interior))
 				{

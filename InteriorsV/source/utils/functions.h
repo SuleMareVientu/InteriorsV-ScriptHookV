@@ -8,6 +8,7 @@ void PrintHelp(char* string);
 void LoadIPL(char* ipl);
 void UnloadIPL(char* ipl);
 void EnableInterior(int interior);
+void DisableInterior(int interior);
 void AltUnlockDoor(Hash EntityHash, float x, float y, float z);
 void ForceUnlockDoor(Hash EntityHash, float x, float y, float z, int seed);
 void SetDoorUnlockDistance(Hash EntityHash, float x, float y, float z, float distance);
