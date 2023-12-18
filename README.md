@@ -10,6 +10,8 @@ This mod is **not compatibile** with MPmaps, disable them before installing.
 
 **Requires [ScriptHookV](http://www.dev-c.com/gtav/scripthookv/)**
 
+**v1.3** - Changelog: The key to toggle blips can now be changed inside the INI using MS virtual keycodes. Interior streaming has been greatly improved and many bugs were fixed.
+
 **v1.2** - Changelog:
 - Interiors added:
     - 9 Low-end Apartments (teleport, already enabled in SP map)
