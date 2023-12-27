@@ -1,5 +1,5 @@
 # InteriorsV-ScriptHookV [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
-![Screenshot](Images/Preview/InteriorsV.png?raw=true)
+![Screenshot](https://github.com/SuleMareVientu/InteriorsV-ScriptHookV/blob/images/InteriorsV.png?raw=true)
 Open-source and lore-friendly alternative to Open All Interiors script. 
 
 It does not include the latest online interiors (from MPmaps), but it does include various optimizations for low-end hardware and story mode compatibility.
@@ -48,7 +48,7 @@ This mod is **not compatibile** with MPmaps, disable them before installing.
 **v1.1** - Changelog: Added blips and INI config. All interiors and blips can be disabled via INI. Disabled interiors won't show blips on the map.
 
 ## Locations (only Los Santos, full map in Releases):
-![Screenshot](Images/Los-Santos.jpg?raw=true)
+![Screenshot](https://github.com/SuleMareVientu/InteriorsV-ScriptHookV/blob/images/Map/Los-Santos.jpg?raw=true)
 
 ### Accessible Interiors:
 **Safehouses:**
