@@ -210,6 +210,8 @@ void HighEndApartmentsCulling()
 		return;
 	}
 
+	char* pedScenario = "PROP_HUMAN_SEAT_CHAIR";
+
 	//Eclipse Towers Apartments culling
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -777.3174f, 312.8665f, 84.6982f) < distance &&
 		(currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-797.5f, 335.31f, 207.29f) ||	//Eclipse Towers, Apt 31
@@ -230,10 +232,10 @@ void HighEndApartmentsCulling()
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(287959306);		//SS1_LOD_01_02_08_09_10_11
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(2064708988);	//SS1_02_SLOD1
 		GRAPHICS::DISABLE_OCCLUSION_THIS_FRAME();
-		DeleteScenarioPedAtCoords(-785.2530f, 334.0298f, 200.9106f, "PROP_HUMAN_SEAT_CHAIR");
-		DeleteScenarioPedAtCoords(-770.8542f, 323.2263f, 216.5474f, "PROP_HUMAN_SEAT_CHAIR");
-		DeleteScenarioPedAtCoords(-785.7202f, 334.4220f, 153.2912f, "PROP_HUMAN_SEAT_CHAIR");
-		DeleteScenarioPedAtCoords(-770.7636f, 323.2263f, 170.0934f, "PROP_HUMAN_SEAT_CHAIR");
+		DeleteScenarioPedAtCoords(-785.2530f, 334.0298f, 200.9106f, pedScenario);
+		DeleteScenarioPedAtCoords(-770.8542f, 323.2263f, 216.5474f, pedScenario);
+		DeleteScenarioPedAtCoords(-785.7202f, 334.4220f, 153.2912f, pedScenario);
+		DeleteScenarioPedAtCoords(-770.7636f, 323.2263f, 170.0934f, pedScenario);
 	}
 
 	//Weazel Plaza Apartments culling
@@ -250,9 +252,9 @@ void HighEndApartmentsCulling()
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(41930611);		//bh1_09_ema
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-200410159);	//prop_wall_light_12a
 		GRAPHICS::DISABLE_OCCLUSION_THIS_FRAME();
-		DeleteScenarioPedAtCoords(-896.5284f, -450.9871f, 119.8241f, "PROP_HUMAN_SEAT_CHAIR");
-		DeleteScenarioPedAtCoords(-901.8891f, -439.0873f, 114.8968f, "PROP_HUMAN_SEAT_CHAIR");
-		DeleteScenarioPedAtCoords(-893.1642f, -441.6309f, 88.7508f, "PROP_HUMAN_SEAT_CHAIR");
+		DeleteScenarioPedAtCoords(-896.5284f, -450.9871f, 119.8241f, pedScenario);
+		DeleteScenarioPedAtCoords(-901.8891f, -439.0873f, 114.8968f, pedScenario);
+		DeleteScenarioPedAtCoords(-893.1642f, -441.6309f, 88.7508f, pedScenario);
 	}
 
 	//Tinsel Towers Apartments culling
@@ -267,8 +269,8 @@ void HighEndApartmentsCulling()
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(253211729);		//SS1_Emissive_SS1_02a_LOD
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-500045280);	//ss1_02_ss1_emissive_ss1_02
 		GRAPHICS::DISABLE_OCCLUSION_THIS_FRAME();
-		DeleteScenarioPedAtCoords(-607.4993f, 59.0075f, 101.3167f, "PROP_HUMAN_SEAT_CHAIR");
-		DeleteScenarioPedAtCoords(-593.8669f, 48.3100f, 86.9158f, "PROP_HUMAN_SEAT_CHAIR");
+		DeleteScenarioPedAtCoords(-607.4993f, 59.0075f, 101.3167f, pedScenario);
+		DeleteScenarioPedAtCoords(-593.8669f, 48.3100f, 86.9158f, pedScenario);
 	}
 
 	//Richards Majestic Apartments culling
@@ -284,8 +286,8 @@ void HighEndApartmentsCulling()
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(1828238070);	//bh1_08_bld2_LOD
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-603554352);	//bh1_08_em
 		GRAPHICS::DISABLE_OCCLUSION_THIS_FRAME();
-		DeleteScenarioPedAtCoords(-918.3259f, -375.0222f, 102.7300f, "PROP_HUMAN_SEAT_CHAIR");
-		DeleteScenarioPedAtCoords(-911.7831f, -376.1330f, 78.7702f, "PROP_HUMAN_SEAT_CHAIR");
+		DeleteScenarioPedAtCoords(-918.3259f, -375.0222f, 102.7300f, pedScenario);
+		DeleteScenarioPedAtCoords(-911.7831f, -376.1330f, 78.7702f, pedScenario);
 	}
 
 	//4 Integrity Way Apartments culling
@@ -300,8 +302,8 @@ void HighEndApartmentsCulling()
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-1825769292);	//DT1_Emissive_DT1_03_b1
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-285026450);	//dt1_03_dt1_Emissive_b1
 		GRAPHICS::DISABLE_OCCLUSION_THIS_FRAME();
-		DeleteScenarioPedAtCoords(-18.9438f, -597.9114f, 93.5225f, "PROP_HUMAN_SEAT_CHAIR");
-		DeleteScenarioPedAtCoords(-27.8779f, -584.8820f, 83.4045f, "PROP_HUMAN_SEAT_CHAIR");
+		DeleteScenarioPedAtCoords(-18.9438f, -597.9114f, 93.5225f, pedScenario);
+		DeleteScenarioPedAtCoords(-27.8779f, -584.8820f, 83.4045f, pedScenario);
 	}
 
 	//3 Alta Street Tower Apartments culling
@@ -315,8 +317,8 @@ void HighEndApartmentsCulling()
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-1294038851);	//dt1_20_build2
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-312225717);	//dt1_20_dt1_emissive_dt1_20
 		GRAPHICS::DISABLE_OCCLUSION_THIS_FRAME();
-		DeleteScenarioPedAtCoords(-276.4401f, -950.4869f, 85.8006f, "PROP_HUMAN_SEAT_CHAIR");
-		DeleteScenarioPedAtCoords(-266.7457f, -957.8518f, 70.5210f, "PROP_HUMAN_SEAT_CHAIR");
+		DeleteScenarioPedAtCoords(-276.4401f, -950.4869f, 85.8006f, pedScenario);
+		DeleteScenarioPedAtCoords(-266.7457f, -957.8518f, 70.5210f, pedScenario);
 	}
 
 	//Del Perro Heights Apartments culling
@@ -330,8 +332,8 @@ void HighEndApartmentsCulling()
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-160801422);	//sm_14_bld2
 		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-1969201018);	//sm_14_emissive
 		GRAPHICS::DISABLE_OCCLUSION_THIS_FRAME();
-		DeleteScenarioPedAtCoords(-1460.754f, -529.7892f, 62.8463f, "PROP_HUMAN_SEAT_CHAIR");
-		DeleteScenarioPedAtCoords(-1460.754f, -529.7892f, 50.2187f, "PROP_HUMAN_SEAT_CHAIR");
+		DeleteScenarioPedAtCoords(-1460.754f, -529.7892f, 62.8463f, pedScenario);
+		DeleteScenarioPedAtCoords(-1460.754f, -529.7892f, 50.2187f, pedScenario);
 	}
 
 	return;

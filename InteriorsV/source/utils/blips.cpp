@@ -109,37 +109,40 @@ void AddBlips()
 	if (iniBlipsOnlineApartments)
 	{
 		//Low-end Apartments
-		BlipZancudoAvenue140.AddBlip(1900.1719f, 3772.9207f, 31.8744f, 1.00f, "Low-end Apartment", 40, 24);
-		BlipGrapeseedAvenue1893.AddBlip(1662.7830f, 4776.2407f, 41.0076f, 1.00f, "Low-end Apartment", 40, 24);
-		BlipLasLagunasBoulevard2143.AddBlip(-42.0982f, -58.3112f, 62.4603f, 1.00f, "Low-end Apartment", 40, 24);
-		BlipCougarAvenue0069.AddBlip(-1533.477f, -326.7305f, 46.9113f, 1.00f, "Low-end Apartment", 40, 24);
-		BlipProsperityStreet1237.AddBlip(-1564.138f, -406.5406f, 41.3890f, 1.00f, "Low-end Apartment", 40, 24);
-		BlipSanVitasStreet1561.AddBlip(-201.4327f, 186.2523f, 79.3276f, 1.00f, "Low-end Apartment", 40, 24);
-		BlipBoulevardDelPerro1115.AddBlip(-1606.642f, -432.2548f, 39.4367f, 1.00f, "Low-end Apartment", 40, 24);
-		BlipVespucciBoulevard2057.AddBlip(-662.4279f, -853.6377f, 23.4586f, 1.00f, "Low-end Apartment", 40, 24);
-		BlipSouthRockfordDrive0112.AddBlip(-813.2224f, -980.9390f, 13.1482f, 1.00f, "Low-end Apartment", 40, 24);
+		char* lowEndText = "Low-end Apartment";
+		BlipZancudoAvenue140.AddBlip(1900.1719f, 3772.9207f, 31.8744f, 1.00f, lowEndText, 40, 24);
+		BlipGrapeseedAvenue1893.AddBlip(1662.7830f, 4776.2407f, 41.0076f, 1.00f, lowEndText, 40, 24);
+		BlipLasLagunasBoulevard2143.AddBlip(-42.0982f, -58.3112f, 62.4603f, 1.00f, lowEndText, 40, 24);
+		BlipCougarAvenue0069.AddBlip(-1533.477f, -326.7305f, 46.9113f, 1.00f, lowEndText, 40, 24);
+		BlipProsperityStreet1237.AddBlip(-1564.138f, -406.5406f, 41.3890f, 1.00f, lowEndText, 40, 24);
+		BlipSanVitasStreet1561.AddBlip(-201.4327f, 186.2523f, 79.3276f, 1.00f, lowEndText, 40, 24);
+		BlipBoulevardDelPerro1115.AddBlip(-1606.642f, -432.2548f, 39.4367f, 1.00f, lowEndText, 40, 24);
+		BlipVespucciBoulevard2057.AddBlip(-662.4279f, -853.6377f, 23.4586f, 1.00f, lowEndText, 40, 24);
+		BlipSouthRockfordDrive0112.AddBlip(-813.2224f, -980.9390f, 13.1482f, 1.00f, lowEndText, 40, 24);
 		//Medium Apartments
-		BlipHangmanAve4.AddBlip(-1406.0433f, 526.8655f, 122.8362f, 1.00f, "Medium Apartment", 40, 18);
-		BlipProcopioDrive4401.AddBlip(-302.4685f, 6327.2275f, 31.8920f, 1.00f, "Medium Apartment", 40, 18);
-		BlipProcopioDrive4584.AddBlip(-105.3389f, 6528.8530f, 29.1719f, 1.00f, "Medium Apartment", 40, 18);
-		BlipBayCityAvenue0115.AddBlip(-969.9915f, -1431.375f, 6.6792f, 1.00f, "Medium Apartment", 40, 18);
-		BlipMiltonRoad0184.AddBlip(-511.7271f, 108.5600f, 62.8006f, 1.00f, "Medium Apartment", 40, 18);
-		BlipSustanciaRoad12.AddBlip(1342.2675f, -1578.931f, 53.0533f, 1.00f, "Medium Apartment", 40, 18);
-		BlipSouthMoMiltonDrive0504.AddBlip(-628.2673f, 169.7025f, 60.1525f, 1.00f, "Medium Apartment", 40, 18);
-		BlipSouthRockfordDrive0325.AddBlip(-831.4262f, -862.1733f, 19.6947f, 1.00f, "Medium Apartment", 40, 18);
-		BlipDreamTower.AddBlip(-762.9729f, -753.7900f, 26.8736f, 1.00f, "Medium Apartment", 40, 18);
-		BlipPowerStreet1162.AddBlip(285.6400f, -160.2583f, 63.6221f, 1.00f, "Medium Apartment", 40, 18);
-		BlipSpanishAvenue0605.AddBlip(3.3769f, 36.5695f, 70.5354f, 1.00f, "Medium Apartment", 40, 18);
-		BlipLasLagunasBoulevard0604.AddBlip(9.6973f, 81.8959f, 77.4352f, 1.00f, "Medium Apartment", 40, 18);
-		BlipTheRoyale.AddBlip(-197.6927f, 86.0134f, 68.7562f, 1.00f, "Medium Apartment", 40, 18);
+		char* mediumEndText = "Medium Apartment";
+		BlipHangmanAve4.AddBlip(-1406.0433f, 526.8655f, 122.8362f, 1.00f, mediumEndText, 40, 18);
+		BlipProcopioDrive4401.AddBlip(-302.4685f, 6327.2275f, 31.8920f, 1.00f, mediumEndText, 40, 18);
+		BlipProcopioDrive4584.AddBlip(-105.3389f, 6528.8530f, 29.1719f, 1.00f, mediumEndText, 40, 18);
+		BlipBayCityAvenue0115.AddBlip(-969.9915f, -1431.375f, 6.6792f, 1.00f, mediumEndText, 40, 18);
+		BlipMiltonRoad0184.AddBlip(-511.7271f, 108.5600f, 62.8006f, 1.00f, mediumEndText, 40, 18);
+		BlipSustanciaRoad12.AddBlip(1342.2675f, -1578.931f, 53.0533f, 1.00f, mediumEndText, 40, 18);
+		BlipSouthMoMiltonDrive0504.AddBlip(-628.2673f, 169.7025f, 60.1525f, 1.00f, mediumEndText, 40, 18);
+		BlipSouthRockfordDrive0325.AddBlip(-831.4262f, -862.1733f, 19.6947f, 1.00f, mediumEndText, 40, 18);
+		BlipDreamTower.AddBlip(-762.9729f, -753.7900f, 26.8736f, 1.00f, mediumEndText, 40, 18);
+		BlipPowerStreet1162.AddBlip(285.6400f, -160.2583f, 63.6221f, 1.00f, mediumEndText, 40, 18);
+		BlipSpanishAvenue0605.AddBlip(3.3769f, 36.5695f, 70.5354f, 1.00f, mediumEndText, 40, 18);
+		BlipLasLagunasBoulevard0604.AddBlip(9.6973f, 81.8959f, 77.4352f, 1.00f, mediumEndText, 40, 18);
+		BlipTheRoyale.AddBlip(-197.6927f, 86.0134f, 68.7562f, 1.00f, mediumEndText, 40, 18);
 		//High-end Apartments
-		BlipEclipseTowersApartments.AddBlip(-775.0563f, 312.8823f, 84.6982f, 1.00f, "High-end Apartments", 40, 36);
-		BlipWeazelPlazaApartments.AddBlip(-915.3770f, -452.9363f, 38.5999f, 1.00f, "High-end Apartments", 40, 36);
-		BlipTinselTowersApartments.AddBlip(-616.9627f, 37.4050f, 42.5870f, 1.00f, "High-end Apartments", 40, 36);
-		BlipRichardsMajesticApartments.AddBlip(-934.8232f, -381.5349f, 37.9613f, 1.00f, "High-end Apartments", 40, 36);
-		Blip4IntegrityWayApartments.AddBlip(-47.9679f, -587.2177f, 36.9580f, 1.00f, "High-end Apartments", 40, 36);
-		Blip3AltaStreetTowerApartments.AddBlip(-262.5153f, -971.1097f, 30.2198f, 1.00f, "High-end Apartments", 40, 36);
-		BlipDelPerroHeightsApartments.AddBlip(-1442.0504f, -545.0800f, 33.7418f, 1.00f, "High-end Apartments", 40, 36);
+		char* highEndText = "High-end Apartments";
+		BlipEclipseTowersApartments.AddBlip(-775.0563f, 312.8823f, 84.6982f, 1.00f, highEndText, 40, 36);
+		BlipWeazelPlazaApartments.AddBlip(-915.3770f, -452.9363f, 38.5999f, 1.00f, highEndText, 40, 36);
+		BlipTinselTowersApartments.AddBlip(-616.9627f, 37.4050f, 42.5870f, 1.00f, highEndText, 40, 36);
+		BlipRichardsMajesticApartments.AddBlip(-934.8232f, -381.5349f, 37.9613f, 1.00f, highEndText, 40, 36);
+		Blip4IntegrityWayApartments.AddBlip(-47.9679f, -587.2177f, 36.9580f, 1.00f, highEndText, 40, 36);
+		Blip3AltaStreetTowerApartments.AddBlip(-262.5153f, -971.1097f, 30.2198f, 1.00f, highEndText, 40, 36);
+		BlipDelPerroHeightsApartments.AddBlip(-1442.0504f, -545.0800f, 33.7418f, 1.00f, highEndText, 40, 36);
 	}
 
 	BlipPremiumDeluxeMotorsport.AddBlip(-40.31f, -1097.43f, 26.80f, 1.00f, "Premium Deluxe Motorsport", 225, colour);

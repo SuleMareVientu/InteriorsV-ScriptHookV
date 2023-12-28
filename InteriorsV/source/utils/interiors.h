@@ -51,8 +51,5 @@ void Misc();
 //Scenario Groups
 void ScenarioGroups();
 
-//Map Fixes
-void Fixes();
-
 //Extras
 void UnlockDoors();

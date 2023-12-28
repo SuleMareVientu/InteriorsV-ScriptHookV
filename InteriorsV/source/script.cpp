@@ -72,9 +72,6 @@ void update()
 
 	//Scenario Groups
 	ScenarioGroups();
-
-	//Map Fixes
-	Fixes();
 	return;
 }
 

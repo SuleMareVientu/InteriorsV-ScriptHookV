@@ -66,8 +66,6 @@ bool iniHighEndApartments = false;
 //Extras
 //Scenario Groups
 bool iniScenarioGroups = true;
-//Map Fixes
-bool iniFixes = true;
 
 void ReadINI()
 {
@@ -157,8 +155,6 @@ void ReadINI()
 //////////////////////////////////////Extras//////////////////////////////////////
 	//Scenario Groups
 	iniScenarioGroups = ini.GetBoolValue("Extras", "ScenarioGroups", true);
-	//Map Fixes
-	iniFixes = ini.GetBoolValue("Extras", "Fixes", true);
 
 //////////////////////////////////////Blips//////////////////////////////////////
 	BlipPremiumDeluxeMotorsport.enable = iniPremiumDeluxeMotorsport;

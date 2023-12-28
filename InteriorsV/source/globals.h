@@ -74,8 +74,6 @@ extern bool iniHighEndApartments;
 //Extras
 //Scenario Groups
 extern bool iniScenarioGroups;
-//Map Fixes
-extern bool iniFixes;
 
 //////////////////////////////////////Blips//////////////////////////////////////
 class CustomBlip {

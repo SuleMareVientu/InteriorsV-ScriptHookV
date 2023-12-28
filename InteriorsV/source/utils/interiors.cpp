@@ -674,7 +674,7 @@ void UnionDepositoryVault()
 
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 15.0f, -690.0f, 35.0f) < distance)
 	{
-		LoadIPL("FINBANK");
+		LoadIPL("finbank");
 
 		if (missionFlag)
 			return;
@@ -689,7 +689,7 @@ void UnionDepositoryVault()
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1011692606, -3.58445f, -668.1644f, 16.35861f, true, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fingate)
 	}
 	else if (!missionFlag)
-		UnloadIPL("FINBANK");
+		UnloadIPL("finbank");
 
 	return;
 }
@@ -1065,31 +1065,6 @@ void ScenarioGroups()
 		SetScenarioGroup("paleto_bank", true);
 	else
 		SetScenarioGroup("paleto_bank", false);
-	return;
-}
-
-///////////////////////////////////////MAP FIXES/////////////////////////////////////////
-
-void Fixes()
-{
-	if (!iniFixes)
-		return;
-
-	UnloadIPL("CS3_07_MPGates");
-	LoadIPL("chop_props");
-	LoadIPL("railing_start");
-	LoadIPL("Carwash_with_spinners");
-	LoadIPL("KT_CarWash");
-	LoadIPL("golfflags");
-	LoadIPL("cs5_4_trains");
-	LoadIPL("ch1_02_closed");
-	LoadIPL("v_tunnel_hole");
-	LoadIPL("canyonriver01");
-	LoadIPL("canyonriver01_lod");
-	LoadIPL("cs3_05_water_grp1");
-	LoadIPL("cs3_05_water_grp1_lod");
-	LoadIPL("trv1_trail_start");
-	LoadIPL("CanyonRvrShallow");
 	return;
 }
 
