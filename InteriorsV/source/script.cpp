@@ -84,9 +84,11 @@ void ScriptMain()
 		playerPed = PLAYER::PLAYER_PED_ID();
 		missionFlag = MISC::GET_MISSION_FLAG();
 		
-		//Check if player exists
-		if (!ENTITY::DOES_ENTITY_EXIST(playerPed))
-			return;
+		//Check if player exists and scene is not loading
+		while (!ENTITY::DOES_ENTITY_EXIST(playerPed) || !PLAYER::IS_PLAYER_CONTROL_ON(PLAYER::PLAYER_ID()))
+		{
+			WAIT(0);
+		}
 
 		//Updates 1 time every 5 seconds
 		if (SYSTEM::TIMERA() > 5000)
@@ -98,7 +100,7 @@ void ScriptMain()
 		else
 		{
 			playerLoc = ENTITY::GET_ENTITY_COORDS(playerPed, false);
-			UnlockDoors();	//These doors need to be unlocked every frame
+			UnlockDoors();	//These doors need to be unlocked every frame. Now also includes teleport markers for story interiors
 		}
 
 		//Blips toggle. Default Key: F3 (https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes)

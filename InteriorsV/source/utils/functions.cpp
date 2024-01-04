@@ -229,6 +229,22 @@ void AddBlip(float x, float y, float z, float scale, char* title, int id, int co
 	return;
 }
 
+bool AdditionalChecks(Ped ped)
+{
+	if (PED::IS_PED_RAGDOLL(ped)			||
+		TASK::IS_PED_GETTING_UP(ped)		||
+		PED::IS_PED_FALLING(ped)			||
+		PED::IS_PED_JUMPING(ped)			||
+		PED::IS_PED_IN_MELEE_COMBAT(ped)	||
+		PED::IS_PED_IN_COVER(ped, false)	||
+		PED::IS_PED_SHOOTING(ped)			||
+		!PED::IS_PED_ON_FOOT(ped)			||
+		PED::IS_PED_TAKING_OFF_HELMET(ped))
+		return false;
+	else
+		return true;
+}
+
 bool Teleport(float x, float y, float z, float heading, float headingOut, float markerX, float markerY, float markerZ, int red, int green, int blue, int alpha, char* text, char* textOut, bool overlapCheck)
 {
 	float distanceStart = SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, markerX, markerY, markerZ);
@@ -253,7 +269,7 @@ bool Teleport(float x, float y, float z, float heading, float headingOut, float 
 	if (distanceStart < 2.25f)
 	{
 		PrintHelp(text);
-		if (PAD::IS_DISABLED_CONTROL_JUST_PRESSED(2, 23) && !CAM::IS_SCREEN_FADING_IN() && !CAM::IS_SCREEN_FADED_OUT())
+		if (PAD::IS_DISABLED_CONTROL_JUST_PRESSED(2, 23) && AdditionalChecks(playerPed) && !CAM::IS_SCREEN_FADING_IN() && !CAM::IS_SCREEN_FADED_OUT())
 		{
 			isInsideApartment = true;
 			ENTITY::FREEZE_ENTITY_POSITION(playerPed, true);
@@ -303,7 +319,7 @@ bool Teleport(float x, float y, float z, float heading, float headingOut, float 
 	if (distanceEnd < 2.25f)
 	{
 		PrintHelp(textOut);
-		if (PAD::IS_DISABLED_CONTROL_JUST_PRESSED(2, 23) && !CAM::IS_SCREEN_FADING_IN() && !CAM::IS_SCREEN_FADED_OUT())
+		if (PAD::IS_DISABLED_CONTROL_JUST_PRESSED(2, 23) && AdditionalChecks(playerPed) && !CAM::IS_SCREEN_FADING_IN() && !CAM::IS_SCREEN_FADED_OUT())
 		{
 			if (overlapCheck)
 			{

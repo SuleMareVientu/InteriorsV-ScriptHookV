@@ -20,4 +20,5 @@ void EnableInteriorProp(int interior, char* prop, bool refresh);
 void DisableInteriorProp(int interior, char* prop, bool refresh);
 void SetScenarioGroup(char* scenarioGroup, bool toggle);
 void AddBlip(float x, float y, float z, float scale, char* title, int id, int colour);
+bool AdditionalChecks(Ped ped);
 bool Teleport(float x, float y, float z, float heading, float headingOut, float markerX, float markerY, float markerZ, int red, int green, int blue, int alpha, char* text, char* textOut, bool overlapCheck);
