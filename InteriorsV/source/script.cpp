@@ -11,9 +11,10 @@
 #include "utils\interiors.h"
 #include "utils\onlineteleports.h"
 
+Vector3 playerLoc{ NULL, NULL, NULL, NULL, NULL, NULL };
 Ped playerPed = NULL;
-Vector3 playerLoc{NULL, NULL, NULL, NULL, NULL, NULL};
 bool missionFlag = NULL;
+bool playerControl = false;
 
 void update()
 {
@@ -83,9 +84,14 @@ void ScriptMain()
 	{
 		playerPed = PLAYER::PLAYER_PED_ID();
 		missionFlag = MISC::GET_MISSION_FLAG();
-		
+
+		if (PLAYER::IS_PLAYER_CONTROL_ON(PLAYER::PLAYER_ID()) && !CUTSCENE::IS_CUTSCENE_PLAYING())
+			playerControl = true;
+		else
+			playerControl = false;
+
 		//Check if player exists and scene is not loading
-		while (!ENTITY::DOES_ENTITY_EXIST(playerPed) || !PLAYER::IS_PLAYER_CONTROL_ON(PLAYER::PLAYER_ID()))
+		while (!ENTITY::DOES_ENTITY_EXIST(playerPed))
 		{
 			WAIT(0);
 		}

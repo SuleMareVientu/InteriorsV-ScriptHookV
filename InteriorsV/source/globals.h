@@ -2,9 +2,10 @@
 
 #include <types.h>
 
-extern Ped playerPed;
 extern Vector3 playerLoc;
+extern Ped playerPed;
 extern bool missionFlag;
+extern bool playerControl;
 extern Hash doorHash;
 extern float distance;
 extern bool isInsideApartment;

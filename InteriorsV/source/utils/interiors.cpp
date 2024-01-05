@@ -120,7 +120,7 @@ void PremiumDeluxeMotorsport()
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(2059227086, -59.89302f, -1092.952f, 26.88362f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_csr_door_l)
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2051651622, -31.72353f, -1101.846f, 26.57225f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_door1)
 	}
-	else
+	else if (playerControl)
 	{
 		UnloadIPL("shr_int");
 		UnloadIPL("shr_int_lod");
@@ -141,7 +141,7 @@ void LesterHouse()
 		LoadIPL("v_lesters");
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1145337974, 1273.816f, -1720.697f, 54.92143f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_lester_doorfront)
 	}
-	else
+	else if (playerControl)
 		UnloadIPL("v_lesters");
 	return;
 }
@@ -173,7 +173,7 @@ void LesterFactory()
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(245182344, 716.7808f, -975.4207f, 25.00572f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_ss_door8)
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-681066206, 719.3818f, -975.4185f, 25.00572f, false, 0.0f, 0.0f, 0.0f);		// front (v_ilev_ss_door7)
 	}
-	else
+	else if (playerControl)
 	{
 		UnloadIPL("id2_14_during1");
 		UnloadIPL("id2_14_during1_lod");
@@ -204,7 +204,7 @@ void Lifeinvader()
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(969847031, -1057.767f, -237.484f, 43.021f, false, 0.0f, 0.0f, 0.0f);		// internal (v_ilev_fb_sl_door01)
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(969847031, -1063.842f, -240.6464f, 43.021f, false, 0.0f, 0.0f, 0.0f);		// internal (v_ilev_fb_sl_door01)
 	}
-	else
+	else if (playerControl)
 	{
 		LoadIPL("facelobbyfake");
 		LoadIPL("facelobbyfake_lod");
@@ -246,7 +246,7 @@ void Vangelico()
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(9467943, -630.4265f, -238.4375f, 38.20653f, false, 0.0f, 0.0f, 0.0f);		// front (p_jewel_door_r1)
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1425919976, -631.9554f, -236.3333f, 38.20653f, false, 0.0f, 0.0f, 0.0f);	// front (p_jewel_door_l)
 	}
-	else
+	else if (playerControl)
 	{
 		LoadIPL("jewel2fake");
 		LoadIPL("jewel2fake_lod");
@@ -290,7 +290,7 @@ void FIB()
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1225363909, 127.8489f, -760.4548f, 45.90111f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_doore_l)
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1219957182, 139.1689f, -764.4418f, 44.75182f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_doore_r)
 	}
-	else
+	else if (playerControl)
 	{
 		UnloadIPL("fiblobby");
 		UnloadIPL("fiblobby_lod");
@@ -322,7 +322,7 @@ void FIB()
 		Teleport(136.1618f, -761.7862f, 241.0520f, 160.0f, 160.0f, 136.1337f, -761.8162f, 44.7520f, 240, 200, 80, 150, "Press ~INPUT_ENTER~ to go to floor 49.", "Press ~INPUT_ENTER~ to return to the lobby.", false);
 		Teleport(136.1340f, -761.8201f, 233.1521f, 160.0f, 160.0f, 138.9534f, -762.8441f, 44.7520f, 240, 200, 80, 150, "Press ~INPUT_ENTER~ to go to floor 47.", "Press ~INPUT_ENTER~ to return to the lobby.", false);
 	}
-	else
+	else if (playerControl && !missionFlag)
 	{
 		UnloadIPL("v_fib01");
 		UnloadIPL("v_fib02");
@@ -350,7 +350,7 @@ void Chopshop()
 			OBJECT::DOOR_SYSTEM_SET_DOOR_STATE(-190140885, 0, false, false);
 		}
 	}
-	else
+	else if (playerControl)
 	{
 		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(480.5f, -1319.0f, 30.0f));
 		UnloadIPL("v_chopshop");
@@ -372,7 +372,7 @@ void TequiLaLa()
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(993120320, -565.1712f, 276.6259f, 83.28626f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_roc_door4)
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(993120320, -561.2866f, 293.5044f, 87.77851f, false, 0.0f, 0.0f, 0.0f);	// rear (v_ilev_roc_door4)
 	}
-	else
+	else if (playerControl)
 	{
 		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-565.0f, 276.5f, 83.5f));
 		UnloadIPL("v_rockclub");
@@ -384,7 +384,8 @@ void TequiLaLa()
 //Maze Bank Arena (Fame or Shame)
 void FameorShame()
 {
-	if (!iniFameorShame)
+	//Fix for Franklin's garage camera stuck
+	if (!iniFameorShame || !playerControl)
 		return;
 
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -262.0f, -2021.0f, 36.0f) < distance)
@@ -423,13 +424,17 @@ void CluckingBell()
 		LoadIPL("cs1_02_cf_onmission4_lod");
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1156020871, -182.9104f, 6168.368f, 32.14053f, false, 0.0f, 0.0f, 0.0f);	// front (prop_fnclink_03gate5)
 	}
-	else
+	else if (playerControl)
 	{
 		UnloadIPL("cs1_02_cf_onmission1");
+		UnloadIPL("cs1_02_cf_onmission1_lod");
 		UnloadIPL("cs1_02_cf_onmission2");
 		UnloadIPL("cs1_02_cf_onmission3");
+		UnloadIPL("cs1_02_cf_onmission3_lod");
 		UnloadIPL("cs1_02_cf_onmission4");
+		UnloadIPL("cs1_02_cf_onmission4_lod");
 		LoadIPL("cs1_02_cf_offmission");
+		LoadIPL("cs1_02_cf_offmission_lod");
 	}
 	return;
 }
@@ -448,7 +453,7 @@ void Foundry()
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1428622127, 1065.237f, -2006.079f, 32.23295f, false, 0.0f, 0.0f, 0.0f);	// rear (prop_ron_door_01)
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1428622127, 1085.307f, -2018.561f, 41.62894f, false, 0.0f, 0.0f, 0.0f);	// rear (prop_ron_door_01)
 	}
-	else
+	else if (playerControl)
 	{
 		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(1089.5f, -1995.5f, 33.0f));
 		UnloadIPL("v_foundry");
@@ -469,7 +474,7 @@ void EpsilonRoom()
 		EnableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(245.5f, 370.0f, 106.3f));
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1230442770, 241.3621f, 361.0471f, 105.8883f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_epsstoredoor)
 	}
-	else
+	else if (playerControl)
 	{
 		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(245.5f, 370.0f, 106.3f));
 		UnloadIPL("v_epsilonism");
@@ -489,7 +494,7 @@ void JanitorHouse()
 		LoadIPL("v_janitor");
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(486670049, -107.5373f, -9.018099f, 70.67085f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_janitor_frontdoor)
 	}
-	else
+	else if (playerControl)
 		UnloadIPL("v_janitor");
 
 	return;
@@ -519,7 +524,7 @@ void ONeilRanch()
 		LoadIPL("farm_props");
 		LoadIPL("des_farmhouse");
 	}
-	else
+	else if (playerControl)
 	{
 		UnloadIPL("farm");
 		UnloadIPL("farmint");
@@ -549,7 +554,7 @@ void Scrapyard()
 		DeleteObjectAtCoords(812467272, -589.5237f, -1621.55f, 33.16059f);		// internal (v_ilev_rc_door1_st)
 		DeleteObjectAtCoords(812467272, -590.8198f, -1621.436f, 33.16059f);		// internal (v_ilev_rc_door1_st)
 	}
-	else
+	else if (playerControl)
 	{
 		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-611.4f, -1615.7f, 29.2f));
 		UnloadIPL("v_recycle");
@@ -577,7 +582,7 @@ void HumaneLab()
 		//Underwater entrance at the cooling tunnels
 		UnloadIPL("chemgrill_grp1");
 	}
-	else
+	else if (playerControl && !missionFlag)
 		UnloadIPL("v_lab");
 
 	return;
@@ -610,7 +615,7 @@ void BlaineCountyBank()
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-353187150, -111.48f, 6463.94f, 31.98499f, false, 0.0f, 0.0f, 0.0f);		// front  (v_ilev_bank4door02)
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1184592117, -108.9147f, 6469.104f, 31.91028f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_cbankcountdoor01)
 	}
-	else
+	else if (playerControl)
 	{
 		UnloadIPL("v_bank4");
 	}
@@ -630,7 +635,7 @@ void DignityYacht()
 		LoadIPL("smboat_lodlights");
 		LoadIPL("smboat_distantlights");
 	}
-	else
+	else if (playerControl)
 	{
 		UnloadIPL("smboat");
 		LoadIPL("smboat_lod");
@@ -658,7 +663,7 @@ void ContainerShip()
 		LoadIPL("cargoship");
 		LoadIPL("cargoship_lod");
 	}
-	else
+	else if (playerControl)
 	{
 		UnloadIPL("cargoship");
 		LoadIPL("cargoship_lod");
@@ -688,7 +693,7 @@ void UnionDepositoryVault()
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1011692606, 8.171528f, -672.4393f, 16.35861f, true, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fingate)
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1011692606, -3.58445f, -668.1644f, 16.35861f, true, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fingate)
 	}
-	else if (!missionFlag)
+	else if (playerControl && !missionFlag)
 		UnloadIPL("finbank");
 
 	return;
@@ -706,7 +711,7 @@ void UnionDepositoryParking()
 		LoadIPL("dt1_03_carpark");
 		EnableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-16.0f, -685.00f, 34.0f));
 	}
-	else
+	else if (playerControl)
 	{
 		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-16.0f, -685.00f, 34.0f));
 		UnloadIPL("dt1_03_carpark");
@@ -730,7 +735,7 @@ void Slaughterhouse()
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1755793225, 962.0066f, -2183.816f, 31.06194f, true, 0.0f, 0.0f, 1.0f);	// front (v_ilev_abbmaindoor)
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1468417022, 962.9085f, -2105.813f, 34.20225f, true, 0.0f, 0.0f, 1.0f);	// rear (prop_abat_slide)
 	}
-	else
+	else if (playerControl)
 	{
 		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(981.0f, -2186.0f, 32.1f));
 		UnloadIPL("v_abattoir");
@@ -742,17 +747,21 @@ void Slaughterhouse()
 //Solomon's Office
 void SolomonOffice()
 {
-	if (!iniSolomonOffice || missionFlag)
+	if (!iniSolomonOffice)
 		return;
 
 	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -1007.14f, -478.53f, 51.57f) < distance)
 	{
 		LoadIPL("v_58_sol_office");
 		EnableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-1007.14f, -478.53f, 51.57f));
+		
+		if (missionFlag)
+			return;
+
 		Teleport(-1002.9615f, -477.8428f, 49.0271f, 120.0f, 120.0f, -1011.6970f, -480.1367f, 38.9756f, 240, 200, 80, 150, "Press ~INPUT_ENTER~ to enter Solomon's office.", "Press ~INPUT_ENTER~ to exit the office.", false);
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2030220382, -1002.147f, -478.0642f, 50.11668f, true, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_sol_off_door01)
 	}
-	else
+	else if (playerControl && !missionFlag)
 	{
 		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-1007.14f, -478.53f, 51.57f));
 		UnloadIPL("v_58_sol_office");
@@ -788,7 +797,7 @@ void Morgue()
 		if (!missionFlag)
 			Teleport(247.0606f, -1371.8202f, 23.5378f, -45.0f, 145.0f, 240.9777f, -1379.1080f, 32.7417f, 240, 200, 80, 150, "Press ~INPUT_ENTER~ to enter the LS County Morgue.", "Press ~INPUT_ENTER~ to exit the morgue.", false);
 	}
-	else
+	else if (playerControl && !missionFlag)
 	{
 		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(275.446f, -1361.11f, 24.5378f));
 		UnloadIPL("coroner_int_on");
@@ -832,7 +841,7 @@ void PaletoSheriffOffice()
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1501157055, -444.4985f, 6017.06f, 31.86633f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_shrf2door)
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1501157055, -442.66f, 6015.222f, 31.86633f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_shrf2door)
 	}
-	else
+	else if (playerControl)
 	{
 		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-447.0f, 6013.5f, 32.3f));
 		UnloadIPL("v_sheriff2");
@@ -854,7 +863,7 @@ void SandySheriffOffice()
 		EnableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(1853.0f, 3688.0f, 35.0f));
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1765048490, 1855.685f, 3683.93f, 34.59282f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_shrfdoor)
 	}
-	else
+	else if (playerControl)
 	{
 		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(1853.0f, 3688.0f, 35.0f));
 		UnloadIPL("v_sheriff");
