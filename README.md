@@ -10,6 +10,8 @@ This mod is **not compatibile** with MPmaps, disable them before installing.
 
 **Requires [ScriptHookV](http://www.dev-c.com/gtav/scripthookv/)**
 
+**v1.4.1** - Changelog: Fixed mission compatibility.
+
 **v1.4** - Changelog: Fixed crashes and teleports, general improvements.
 
 **v1.3** - Changelog: The key to toggle blips can now be changed inside the INI using MS virtual keycodes. Interior streaming has been greatly improved and many bugs were fixed.
