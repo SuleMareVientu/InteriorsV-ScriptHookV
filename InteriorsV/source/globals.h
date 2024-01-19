@@ -1,13 +1,12 @@
 #pragma once
-
 #include <types.h>
 
 extern Vector3 playerLoc;
 extern Ped playerPed;
 extern bool missionFlag;
 extern bool playerControl;
-extern Hash doorHash;
-extern float distance;
+extern Hash tempDoorHash;
+extern const float distance;
 extern bool isInsideApartment;
 
 //////////////////////////////////////INI Settings//////////////////////////////////////
@@ -24,6 +23,11 @@ extern bool iniMissionInteriors;
 extern bool iniUnusedInteriors;
 extern bool iniOnlineInteriors;
 extern bool iniMiscInteriors;
+extern bool iniGates;
+
+//Extras
+extern bool iniUnlockBarriersNearPlayer;
+extern bool iniScenarioGroups;
 
 //Interiors
 //Safehouses
@@ -71,10 +75,6 @@ extern bool iniFleecaBanks;
 extern bool iniLowEndApartments;
 extern bool iniMediumEndApartments;
 extern bool iniHighEndApartments;
-
-//Extras
-//Scenario Groups
-extern bool iniScenarioGroups;
 
 //////////////////////////////////////Blips//////////////////////////////////////
 class CustomBlip {

@@ -18,10 +18,10 @@ bool playerControl = false;
 
 void update()
 {
-	playerLoc = ENTITY::GET_ENTITY_COORDS(playerPed, false);
+	playerLoc = GET_ENTITY_COORDS(playerPed, false);
 
 	//Prints current interior ID
-	//Print(ToString(INTERIOR::GET_INTERIOR_AT_COORDS(playerLoc.x, playerLoc.y, playerLoc.z)), 5000);
+	//Print(ToString(GET_INTERIOR_AT_COORDS(playerLoc.x, playerLoc.y, playerLoc.z)), 5000);
 
 	//Safehouses
 	ClintonResidence();
@@ -70,6 +70,7 @@ void update()
 
 	//Misc Interiors
 	Misc();
+	Gates();
 
 	//Scenario Groups
 	ScenarioGroups();
@@ -79,34 +80,34 @@ void update()
 void ScriptMain()
 {
 	ReadINI();
-	SYSTEM::SETTIMERA(0);
+	SETTIMERA(0);
 	while (true)
 	{
-		playerPed = PLAYER::PLAYER_PED_ID();
-		missionFlag = MISC::GET_MISSION_FLAG();
+		playerPed = PLAYER_PED_ID();
+		missionFlag = GET_MISSION_FLAG();
 
-		if (PLAYER::IS_PLAYER_CONTROL_ON(PLAYER::PLAYER_ID()) && !CUTSCENE::IS_CUTSCENE_PLAYING())
+		if (IS_PLAYER_CONTROL_ON(PLAYER_ID()) && !IS_CUTSCENE_PLAYING())
 			playerControl = true;
 		else
 			playerControl = false;
 
 		//Check if player exists and scene is not loading
-		while (!ENTITY::DOES_ENTITY_EXIST(playerPed))
+		while (!DOES_ENTITY_EXIST(playerPed))
 		{
 			WAIT(0);
 		}
 
 		//Updates 1 time every 5 seconds
-		if (SYSTEM::TIMERA() > 5000)
+		if (TIMERA() > 5000)
 		{
-			SYSTEM::SETTIMERA(0);
+			SETTIMERA(0);
 			update();
 			AddBlips();
 		}
 		else
 		{
-			playerLoc = ENTITY::GET_ENTITY_COORDS(playerPed, false);
-			UnlockDoors();	//These doors need to be unlocked every frame. Now also includes teleport markers for story interiors
+			playerLoc = GET_ENTITY_COORDS(playerPed, false);
+			UnlockDoors();	//These doors need to be unlocked every frame. Now also includes teleport markers for story interiors		
 		}
 
 		//Blips toggle. Default Key: F3 (https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes)
@@ -120,7 +121,15 @@ void ScriptMain()
 				AddBlips();
 			}
 		}
+
+		//Run every frame
+		Gates();
+		UnlockBarriersNearPlayer();
 		Teleports();
+
+		//Fix apartment loading when loading a save that was taken inside
+		LoadApartmentsAtStartup();
+
 		WAIT(0);
 	}
 	return;

@@ -15,6 +15,11 @@ bool iniMissionInteriors = true;
 bool iniUnusedInteriors = true;
 bool iniOnlineInteriors = true;
 bool iniMiscInteriors = true;
+bool iniGates = true;
+
+//Extras
+bool iniUnlockBarriersNearPlayer = true;
+bool iniScenarioGroups = true;
 
 //Interiors
 //Safehouses
@@ -63,10 +68,6 @@ bool iniLowEndApartments = false;
 bool iniMediumEndApartments = false;
 bool iniHighEndApartments = false;
 
-//Extras
-//Scenario Groups
-bool iniScenarioGroups = true;
-
 void ReadINI()
 {
 	CSimpleIniA ini;
@@ -75,7 +76,7 @@ void ReadINI()
 	if (res != SI_OK)
 		return;
 
-//////////////////////////////////////Keys//////////////////////////////////////
+//////////////////////////////////////Keys//////////////////////////////////////////
 	
 	iniToggleBlips = ini.GetLongValue("Keys", "ToggleBlips", 0x72);
 
@@ -89,8 +90,14 @@ void ReadINI()
 	iniOnlineInteriors = ini.GetBoolValue("Settings", "OnlineInteriors", true);
 	iniUnusedInteriors = ini.GetBoolValue("Settings", "UnusedInteriors", true);
 	iniMiscInteriors = ini.GetBoolValue("Settings", "MiscInteriors", true);
+	iniGates = ini.GetBoolValue("Settings", "Gates", true);
 
-//////////////////////////////////////Interiors//////////////////////////////////////
+//////////////////////////////////////Extras////////////////////////////////////////
+
+	iniUnlockBarriersNearPlayer = ini.GetBoolValue("Extras", "UnlockBarriersNearPlayer", true);
+	iniScenarioGroups = ini.GetBoolValue("Extras", "ScenarioGroups", true);
+
+//////////////////////////////////////Interiors/////////////////////////////////////
 	//Safehouses
 	if (iniSafehouses)
 	{
@@ -151,10 +158,6 @@ void ReadINI()
 		iniMediumEndApartments = ini.GetBoolValue("Interiors", "MediumEndApartments", true);
 		iniHighEndApartments = ini.GetBoolValue("Interiors", "HighEndApartments", true);
 	}
-
-//////////////////////////////////////Extras//////////////////////////////////////
-	//Scenario Groups
-	iniScenarioGroups = ini.GetBoolValue("Extras", "ScenarioGroups", true);
 
 //////////////////////////////////////Blips//////////////////////////////////////
 	BlipPremiumDeluxeMotorsport.enable = iniPremiumDeluxeMotorsport;

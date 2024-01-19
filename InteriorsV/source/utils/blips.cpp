@@ -72,27 +72,27 @@ CustomBlip BlipDelPerroHeightsApartments;
 
 void CustomBlip::AddBlip(float x, float y, float z, float scale, char* title, int id, int colour)
 {
-	if (!enable || HUD::DOES_BLIP_EXIST(blip))
+	if (!enable || DOES_BLIP_EXIST(blip))
 		return;
 
-	blip = HUD::ADD_BLIP_FOR_COORD(x, y, z);
-	HUD::SET_BLIP_SPRITE(blip, id);
-	HUD::SET_BLIP_DISPLAY(blip, 4);
-	HUD::SET_BLIP_SCALE(blip, scale);
-	HUD::SET_BLIP_COLOUR(blip, colour);
-	HUD::SET_BLIP_AS_SHORT_RANGE(blip, true);
-	HUD::BEGIN_TEXT_COMMAND_SET_BLIP_NAME("STRING");
-	HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(title);
-	HUD::END_TEXT_COMMAND_SET_BLIP_NAME(blip);
+	blip = ADD_BLIP_FOR_COORD(x, y, z);
+	SET_BLIP_SPRITE(blip, id);
+	SET_BLIP_DISPLAY(blip, 4);
+	SET_BLIP_SCALE(blip, scale);
+	SET_BLIP_COLOUR(blip, colour);
+	SET_BLIP_AS_SHORT_RANGE(blip, true);
+	BEGIN_TEXT_COMMAND_SET_BLIP_NAME("STRING");
+	ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(title);
+	END_TEXT_COMMAND_SET_BLIP_NAME(blip);
 	return;
 }
 
 void CustomBlip::RemoveBlip()
 {
-	if (HUD::DOES_BLIP_EXIST(blip))
+	if (DOES_BLIP_EXIST(blip))
 	{
-		HUD::SET_BLIP_ROUTE(blip, false);
-		HUD::REMOVE_BLIP(&blip);
+		SET_BLIP_ROUTE(blip, false);
+		REMOVE_BLIP(&blip);
 	}
 	return;
 }

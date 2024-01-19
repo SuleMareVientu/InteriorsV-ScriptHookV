@@ -6,7 +6,63 @@
 #include "interiors.h"
 #include "functions.h"
 
-float distance = 100000.0f;  //use VDIST2 to save on resources by not calculating the sqr: sqr100000 = 315 units
+const float distance = 300.0f * 300.0f;  //Use VDIST2 to save on resources by not calculating the sqr: sqr100000 ~= 315m
+const float gatesMinDist = 7.5f;
+const float gatesMaxDist = 9.0f;
+const float gatesAltMaxDist = 8.5f;
+static const Hash prop_facgate_01 = 569833973;
+static const Hash prop_facgate_01b = -655468553;
+static Object lastBarrier = NULL;
+
+static void UnlockMichaelBathroomWindow()
+{
+	const Hash windowHash = 1019527301;
+	const float x = -801.900024f, y = 167.699997f, z = 77.580002f;
+
+	DeleteObjectAtCoords(windowHash, -802.73333f, 167.5041f, 77.5824f, 0.15f);		// rear (v_ilev_mm_windowwc)
+	Object window = GET_CLOSEST_OBJECT_OF_TYPE(x, y, z, 0.15f, windowHash, false, true, true);
+	if (!DOES_ENTITY_EXIST(window))
+	{
+		window = CREATE_OBJECT(windowHash, x, y, 76.300002f, false, false, false);
+		FREEZE_ENTITY_POSITION(window, true);
+	}
+	else
+	{
+		//Close when it's raining
+		if (GET_RAIN_LEVEL() > 0.0f)
+			SET_ENTITY_HEADING(window, -160.0f);
+		else
+			SET_ENTITY_HEADING(window, 0.0f);
+	}
+	return;
+}
+
+static void UnlockChopshopGarage()
+{
+	const float x = 484.5642f, y = -1315.574f, z = 30.20331f;
+	const Hash modelHash = -190780785;		//joaat(prop_com_gar_door_01)
+	const Hash doorHash = 455720570;		//joaat(DOORHASH_CARSTEAL_GARAGE_F_FIX)
+
+	if (IS_DOOR_REGISTERED_WITH_SYSTEM(DOORHASH_CARSTEAL_GARAGE_F))
+	{
+		REMOVE_DOOR_FROM_SYSTEM(DOORHASH_CARSTEAL_GARAGE_F, false);
+		Object door = GET_CLOSEST_OBJECT_OF_TYPE(x, y, z, 0.5f, modelHash, false, false, false);
+		if (DOES_ENTITY_EXIST(door))
+		{
+			SET_ENTITY_AS_MISSION_ENTITY(door, true, true);
+			DELETE_OBJECT(&door);
+		}
+	}	
+	
+	if (!IS_DOOR_REGISTERED_WITH_SYSTEM(doorHash))
+	{
+		ADD_DOOR_TO_SYSTEM(doorHash, modelHash, x, y, z, false, false, false);
+		DOOR_SYSTEM_SET_DOOR_STATE(doorHash, DOORSTATE_UNLOCKED, false, false);
+	}
+	else if (DOOR_SYSTEM_GET_DOOR_STATE(doorHash) != 0)
+		DOOR_SYSTEM_SET_DOOR_STATE(doorHash, DOORSTATE_UNLOCKED, false, false);
+	return;
+}
 
 //////////////////////////////////////SAFEHOUSES//////////////////////////////////////
 
@@ -16,11 +72,11 @@ void ClintonResidence()
 	if (!iniClintonResidence)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -15.0f, -1441.0f, 31.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -15.0f, -1441.0f, 31.0f) < distance)
 	{
 		LoadIPL("v_franklins");
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(520341586, -14.86892f, -1441.182f, 31.19323f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_fa_frontdoor)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(703855057, -25.2784f, -1431.061f, 30.83955f, false, 0.0f, 0.0f, 0.0f);	// garage (prop_sc1_21_g_door_01)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_F_HOUSE_SC_F, DOORSTATE_UNLOCKED, false, false);	// front (v_ilev_fa_frontdoor)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_F_HOUSE_SC_G, DOORSTATE_UNLOCKED, false, false);	// garage (prop_sc1_21_g_door_01)
 	}
 	return;
 }
@@ -31,14 +87,14 @@ void FranklinMansion()
 	if (!iniFranklinMansion)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 8.0f, 540.0f, 176.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 8.0f, 540.0f, 176.0f) < distance)
 	{
-		int v_franklinshouse = INTERIOR::GET_INTERIOR_AT_COORDS(7.3f, 531.3f, 175.9f);
+		int v_franklinshouse = GET_INTERIOR_AT_COORDS(7.3f, 531.3f, 175.9f);
 		LoadIPL("v_franklinshouse");
 		EnableInterior(v_franklinshouse);
 		DisableInteriorProp(v_franklinshouse, "locked", false);
 		EnableInteriorProp(v_franklinshouse, "unlocked", true);
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(308207762, 7.518359f, 539.5268f, 176.1776f, false, 0.0f, 0.0f, 0.0f);		// front (v_ilev_fh_frontdoor)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_F_HOUSE_VH_F, DOORSTATE_UNLOCKED, false, false);	// front (v_ilev_fh_frontdoor)
 		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(2052512905, 18.65038f, 546.3401f, 176.3448f, false, 0.0f, 0.0f, 0.0f);	// garage (prop_ch_025c_g_door_01)
 	}
 	return;
@@ -50,28 +106,25 @@ void MichaelHouse()
 	if (!iniMichaelHouse)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -820.0f, 165.0f, 70.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -820.0f, 165.0f, 70.0f) < distance)
 	{
-		int v_michael = INTERIOR::GET_INTERIOR_AT_COORDS(-809.2f, 180.7f, 73.2f);
+		int v_michael = GET_INTERIOR_AT_COORDS(-809.2f, 180.7f, 73.2f);
 		LoadIPL("v_michael");
 		LoadIPL("v_michael_garage");
 
-		if (!INTERIOR::IS_INTERIOR_ENTITY_SET_ACTIVE(v_michael, "V_Michael_bed_Messy"))
+		if (!IS_INTERIOR_ENTITY_SET_ACTIVE(v_michael, "V_Michael_bed_Messy"))
 			EnableInteriorProp(v_michael, "V_Michael_bed_tidy", true);
 
-		//Check if player is NOT Michael
-		if (PED::GET_PED_TYPE(PLAYER::PLAYER_PED_ID()) != 0)
-		{
-			SetDoorUnlockDistanceWithRate(-2125423493, -844.051f, 155.9619f, 66.03221f, 1.0f, 15.15f);	// front gate (prop_lrggate_02_ld)
-			OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1568354151, -848.9343f, 179.3079f, 70.0247f, false, 0.0f, 0.0f, 0.0f);	// front (prop_bh1_48_gate_1)
-			OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1686014385, -816.1068f, 177.5109f, 72.82738f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_mm_doorm_r)
-			OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(159994461, -816.716f, 179.098f, 72.82738f, false, 0.0f, 0.0f, 0.0f);		// front (v_ilev_mm_doorm_l)
-			OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1245831483, -794.1853f, 182.568f, 73.04045f, false, 0.0f, 0.0f, 0.0f);	// rear (prop_bh1_48_backdoor_r)
-			OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1454760130, -793.3943f, 180.5075f, 73.04045f, false, 0.0f, 0.0f, 0.0f);	// rear (prop_bh1_48_backdoor_l)
-			OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1245831483, -794.5051f, 178.0124f, 73.04045f, false, 0.0f, 0.0f, 0.0f);	// rear (prop_bh1_48_backdoor_r)
-			OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1454760130, -796.5657f, 177.2214f, 73.04045f, false, 0.0f, 0.0f, 0.0f);	// rear (prop_bh1_48_backdoor_l)
-			OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(30769481, -815.2816f, 185.975f, 72.99993f, false, 0.0f, 0.0f, 0.0f);		// garage (prop_ld_garaged_01)
-		}
+		SetAutoDoorState(AUTODOOR_MICHAEL_MANSION_GATE, DOORSTATE_UNLOCKED, 0.75f, 15.0f, true);		// front gate (prop_lrggate_02_ld)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_M_MANSION_GA_SM, DOORSTATE_UNLOCKED, false, false);	// front (prop_bh1_48_gate_1)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_M_MANSION_F_R, DOORSTATE_UNLOCKED, false, false);	// rear (v_ilev_mm_doorm_r)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_M_MANSION_F_L, DOORSTATE_UNLOCKED, false, false);	// rear (v_ilev_mm_doorm_l)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_M_MANSION_G1, DOORSTATE_UNLOCKED, false, false);	// garage (prop_ld_garaged_01)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_M_MANSION_R_R1, DOORSTATE_UNLOCKED, false, false);	// rear (prop_bh1_48_backdoor_r)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_M_MANSION_R_L1, DOORSTATE_UNLOCKED, false, false);	// rear (prop_bh1_48_backdoor_l)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_M_MANSION_R_R2, DOORSTATE_UNLOCKED, false, false);	// rear (prop_bh1_48_backdoor_r)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_M_MANSION_R_L2, DOORSTATE_UNLOCKED, false, false);	// rear (prop_bh1_48_backdoor_l)
+		UnlockMichaelBathroomWindow();
 	}
 	return;
 }
@@ -82,15 +135,15 @@ void TrevorTrailer()
 	if (!iniTrevorTrailer)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1973.0f, 3815.0f, 34.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1973.0f, 3815.0f, 34.0f) < distance)
 	{
-		if (!STREAMING::IS_IPL_ACTIVE("trevorstrailertrash"))
+		if (!IS_IPL_ACTIVE("trevorstrailertrash"))
 		{
 			UnloadIPL("trevorstrailer");
 			LoadIPL("trevorstrailertidy");
 		}
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(132154435, 1972.769f, 3815.366f, 33.66326f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_trevtraildr)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(67910261, 1972.787f, 3824.554f, 32.65174f, false, 0.0f, 0.0f, 0.0f);	// garage (prop_cs4_10_tr_gd_01)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_T_TRAILER_CS, DOORSTATE_UNLOCKED, false, false);	// front (v_ilev_trevtraildr)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_T_TRAILER_CS_G, DOORSTATE_UNLOCKED, false, false);	// garage (prop_cs4_10_tr_gd_01)
 	}
 	return;
 }
@@ -103,22 +156,22 @@ void PremiumDeluxeMotorsport()
 	if (!iniPremiumDeluxeMotorsport)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -45.0f, -1100.0f, 27.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -45.0f, -1100.0f, 27.0f) < distance)
 	{
 		UnloadIPL("fakeint");
 		UnloadIPL("fakeint_lod");
 		LoadIPL("shr_int");
 		LoadIPL("shr_int_lod");
-		int v_carshowroom = INTERIOR::GET_INTERIOR_AT_COORDS(-44.0f, -1097.5f, 27.0f);
+		int v_carshowroom = GET_INTERIOR_AT_COORDS(-44.0f, -1097.5f, 27.0f);
 		EnableInterior(v_carshowroom);
 		DisableInteriorProp(v_carshowroom, "shutter_closed", false);
 		EnableInteriorProp(v_carshowroom, "shutter_open", true);
 		SetScenarioGroup("dealership", true);
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1417577297, -37.33113f, -1108.873f, 26.7198f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_csr_door_r)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(2059227086, -39.13366f, -1108.218f, 26.7198f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_csr_door_l)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1417577297, -60.54582f, -1094.749f, 26.88872f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_csr_door_r)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(2059227086, -59.89302f, -1092.952f, 26.88362f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_csr_door_l)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2051651622, -31.72353f, -1101.846f, 26.57225f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_door1)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_DEALERSHIP_SIDE_R, DOORSTATE_UNLOCKED, false, false);	// side (v_ilev_csr_door_r)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_DEALERSHIP_SIDE_L, DOORSTATE_UNLOCKED, false, false);	// side (v_ilev_csr_door_l)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_DEALERSHIP_FRONT_R, DOORSTATE_UNLOCKED, false, false);	// front (v_ilev_csr_door_r)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_DEALERSHIP_FRONT_L, DOORSTATE_UNLOCKED, false, false);	// front (v_ilev_csr_door_l)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_ARM2_SIMEON_OFFICE, DOORSTATE_UNLOCKED, false, false);	// internal (v_ilev_fib_door1)
 	}
 	else if (playerControl)
 	{
@@ -136,10 +189,10 @@ void LesterHouse()
 	if (!iniLesterHouse)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1274.0f, -1720.0f, 55.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1274.0f, -1720.0f, 55.0f) < distance)
 	{
 		LoadIPL("v_lesters");
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1145337974, 1273.816f, -1720.697f, 54.92143f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_lester_doorfront)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_LESTER_F, DOORSTATE_UNLOCKED, false, false);	// front (v_ilev_lester_doorfront)
 	}
 	else if (playerControl)
 		UnloadIPL("v_lesters");
@@ -149,19 +202,19 @@ void LesterHouse()
 //Darnell Bros. Factory (Leaster's Factory)
 void LesterFactory()
 {
-	if (!iniLesterFactory || STREAMING::IS_IPL_ACTIVE("id2_14_during1") || STREAMING::IS_IPL_ACTIVE("id2_14_during2") || STREAMING::IS_IPL_ACTIVE("id2_14_on_fire"))
+	if (!iniLesterFactory || IS_IPL_ACTIVE("id2_14_during1") || IS_IPL_ACTIVE("id2_14_during2") || IS_IPL_ACTIVE("id2_14_on_fire"))
 	{
 		BlipLesterFactory.enable = false;
 		return;
 	}
 
-	if (iniStoryCompatibility && STREAMING::IS_IPL_ACTIVE("id2_14_post_no_int"))
+	if (iniStoryCompatibility && IS_IPL_ACTIVE("id2_14_post_no_int"))
 	{
 		BlipLesterFactory.enable = false;
 		return;
 	}
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 717.0f, -975.0f, 25.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 717.0f, -975.0f, 25.0f) < distance)
 	{
 		UnloadIPL("id2_14_pre_no_int");
 		UnloadIPL("id2_14_pre_no_int_lod");
@@ -170,8 +223,8 @@ void LesterFactory()
 		LoadIPL("id2_14_during1");
 		LoadIPL("id2_14_during1_lod");
 		SetScenarioGroup("sew_machine", true);
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(245182344, 716.7808f, -975.4207f, 25.00572f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_ss_door8)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-681066206, 719.3818f, -975.4185f, 25.00572f, false, 0.0f, 0.0f, 0.0f);		// front (v_ilev_ss_door7)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_SWEATSHOP_R, DOORSTATE_UNLOCKED, false, false);	// front (v_ilev_ss_door8)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_SWEATSHOP_L, DOORSTATE_UNLOCKED, false, false);	// front (v_ilev_ss_door7)
 	}
 	else if (playerControl)
 	{
@@ -189,20 +242,21 @@ void Lifeinvader()
 	if (!iniLifeinvader)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -1050.0f, -235.0f, 40.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -1050.0f, -235.0f, 40.0f) < distance)
 	{
 		UnloadIPL("facelobbyfake");
 		UnloadIPL("facelobbyfake_lod");
 		LoadIPL("facelobby");
 		LoadIPL("facelobby_lod");
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1104171198, -1045.12f, -232.004f, 39.43794f, false, 0.0f, 0.0f, 0.0f);	// rear (v_ilev_fb_doorshortl)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1425071302, -1046.516f, -229.3581f, 39.43794f, false, 0.0f, 0.0f, 0.0f);	// rear (v_ilev_fb_doorshortr)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1679881977, -1083.62f, -260.4166f, 38.1867f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_fb_door01)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1045015371, -1080.974f, -259.0203f, 38.1867f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_fb_door02)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-495720969, -1055.958f, -236.4251f, 44.171f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_door_orangesolid)
+
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_LIFE_INVADER_FRONT_R, DOORSTATE_UNLOCKED, false, false);	// front (v_ilev_fb_doorshortl)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_LIFE_INVADER_FRONT_L, DOORSTATE_UNLOCKED, false, false);	// front (v_ilev_fb_doorshortr)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_LIFE_INVADER_REAR_L, DOORSTATE_UNLOCKED, false, false);		// rear (v_ilev_fb_door01)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_LIFE_INVADER_REAR_R, DOORSTATE_UNLOCKED, false, false);		// rear (v_ilev_fb_door02)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_LINVADER_OFFICE_UP, DOORSTATE_UNLOCKED, false, false);		// internal (v_ilev_door_orangesolid)
 		//"Imagineering room"
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(969847031, -1057.767f, -237.484f, 43.021f, false, 0.0f, 0.0f, 0.0f);		// internal (v_ilev_fb_sl_door01)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(969847031, -1063.842f, -240.6464f, 43.021f, false, 0.0f, 0.0f, 0.0f);		// internal (v_ilev_fb_sl_door01)
+		SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(969847031, -1057.767f, -237.484f, 43.021f, false, 0.0f, 0.0f, 0.0f);		// internal (v_ilev_fb_sl_door01)
+		SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(969847031, -1063.842f, -240.6464f, 43.021f, false, 0.0f, 0.0f, 0.0f);		// internal (v_ilev_fb_sl_door01)
 	}
 	else if (playerControl)
 	{
@@ -217,25 +271,24 @@ void Lifeinvader()
 //Floyd's Apartment
 void FloydHouse()
 {
-	if (!iniFloydHouse || (iniStoryCompatibility && STREAMING::IS_IPL_ACTIVE("vb_30_crimetape")))
+	if (!iniFloydHouse || (iniStoryCompatibility && IS_IPL_ACTIVE("vb_30_crimetape")))
 		return;
 	
 	UnloadIPL("vb_30_crimetape");
-	OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-607040053, -1149.709f, -1521.088f, 10.78267f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_trev_doorfront)
-	
+	DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_T_APARTMENT_VB, DOORSTATE_UNLOCKED, false, false);	// front (v_ilev_trev_doorfront)
 	return;
 }
 
 //Vangelico Jewelry Store
 void Vangelico()
 {
-	if (!iniVangelico || (iniStoryCompatibility && STREAMING::IS_IPL_ACTIVE("bh1_16_refurb")))
+	if (!iniVangelico || (iniStoryCompatibility && IS_IPL_ACTIVE("bh1_16_refurb")))
 	{
 		BlipVangelico.enable = false;
 		return;
 	}
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -630.0f, -238.0f, 38.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -630.0f, -238.0f, 38.0f) < distance)
 	{
 		UnloadIPL("jewel2fake");
 		UnloadIPL("jewel2fake_lod");
@@ -243,8 +296,8 @@ void Vangelico()
 		LoadIPL("post_hiest_unload");
 		LoadIPL("post_hiest_unload_lod");
 		SetScenarioGroup("vangelico", true);
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(9467943, -630.4265f, -238.4375f, 38.20653f, false, 0.0f, 0.0f, 0.0f);		// front (p_jewel_door_r1)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1425919976, -631.9554f, -236.3333f, 38.20653f, false, 0.0f, 0.0f, 0.0f);	// front (p_jewel_door_l)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_HEIST_JEWELERS_R, DOORSTATE_UNLOCKED, false, false);	// front (p_jewel_door_r1)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_HEIST_JEWELERS_L, DOORSTATE_UNLOCKED, false, false);	// front (p_jewel_door_l)
 	}
 	else if (playerControl)
 	{
@@ -259,7 +312,7 @@ void Vangelico()
 //Max Renda Construction Site
 void MaxRenda()
 {
-	if (iniMaxRenda && STREAMING::IS_IPL_ACTIVE("bh1_16_doors_shut"))
+	if (iniMaxRenda && IS_IPL_ACTIVE("bh1_16_doors_shut"))
 	{
 		UnloadIPL("bh1_16_doors_shut");
 		LoadIPL("refit_unload");
@@ -275,20 +328,20 @@ void FIB()
 		return;
 
 	//Lobby
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 106.0f, -745.0f, 46.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 106.0f, -745.0f, 46.0f) < distance)
 	{
 		UnloadIPL("fiblobbyfake");
 		UnloadIPL("fiblobbyfake_lod");
 		LoadIPL("fiblobby");
 		LoadIPL("fiblobby_lod");
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1517873911, 106.3793f, -742.6982f, 46.51962f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_fibl_door02)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-90456267, 105.7607f, -746.646f, 46.18266f, false, 0.0f, 0.0f, 0.0f);		// front (v_ilev_fibl_door01)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2051651622, 127.8489f, -760.4548f, 45.90111f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_door1)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_FIB_F_R, DOORSTATE_UNLOCKED, false, false);	// front (v_ilev_fibl_door01)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_FIB_F_L, DOORSTATE_UNLOCKED, false, false);	// front (v_ilev_fibl_door02)
+		SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2051651622, 127.8489f, -760.4548f, 45.90111f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_door1)
 		//Elevator doors
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1225363909, 134.9403f, -762.9027f, 44.75291f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_doore_l)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1219957182, 137.7594f, -763.9288f, 44.75291f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_doore_r)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1225363909, 127.8489f, -760.4548f, 45.90111f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_doore_l)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1219957182, 139.1689f, -764.4418f, 44.75182f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_doore_r)
+		SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1225363909, 134.9403f, -762.9027f, 44.75291f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_doore_l)
+		SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1219957182, 137.7594f, -763.9288f, 44.75291f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_doore_r)
+		SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1225363909, 127.8489f, -760.4548f, 45.90111f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_doore_l)
+		SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1219957182, 139.1689f, -764.4418f, 44.75182f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_doore_r)
 	}
 	else if (playerControl)
 	{
@@ -299,19 +352,19 @@ void FIB()
 	}
 
 	//Floors
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 135.09f, -736.37f, 248.48f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 135.09f, -736.37f, 248.48f) < distance)
 	{
 		LoadIPL("v_fib01");
 		LoadIPL("v_fib02");
 		LoadIPL("v_fib03");
 		LoadIPL("v_fib04");
 		//Floor 47
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2051651622, 125.179f, -759.5534f, 234.3023f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_door1)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2051651622, 125.3935f, -757.5027f, 234.3021f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_door1)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2051651622, 117.1114f, -760.746f, 234.3022f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_door1)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2051651622, 111.8105f, -749.3636f, 234.3022f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_door1)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2051651622, 111.7746f, -748.436f, 234.3021f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_door1)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2051651622, 117.9132f, -743.9565f, 234.3021f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_door1)
+		SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2051651622, 125.179f, -759.5534f, 234.3023f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_door1)
+		SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2051651622, 125.3935f, -757.5027f, 234.3021f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_door1)
+		SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2051651622, 117.1114f, -760.746f, 234.3022f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_door1)
+		SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2051651622, 111.8105f, -749.3636f, 234.3022f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_door1)
+		SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2051651622, 111.7746f, -748.436f, 234.3021f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_door1)
+		SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2051651622, 117.9132f, -743.9565f, 234.3021f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fib_door1)
 
 		if (missionFlag)
 			return;
@@ -337,22 +390,16 @@ void Chopshop()
 	if (!iniChopshop)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 485.0f, -1315.0f, 30.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 485.0f, -1315.0f, 30.0f) < distance)
 	{
 		LoadIPL("v_chopshop");
-		EnableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(480.5f, -1319.0f, 30.0f));
-		AltUnlockDoor(-664582244, 482.8112f, -1311.953f, 29.35057f);	// front (v_ilev_cs_door)
-		//Replace buggy garage door with new one
-		if (!OBJECT::IS_DOOR_REGISTERED_WITH_SYSTEM(-190140885))		//This is the doorHash, NOT the hash of  the object!
-		{
-			DeleteObjectAtCoords(-190780785, 484.5642f, -1315.574f, 30.20331f);		// prop_com_gar_door_01
-			OBJECT::ADD_DOOR_TO_SYSTEM(-190140885, -190780785, 484.5642f, -1315.574f, 30.20331f, false, false, false);
-			OBJECT::DOOR_SYSTEM_SET_DOOR_STATE(-190140885, 0, false, false);
-		}
+		EnableInterior(GET_INTERIOR_AT_COORDS(480.5f, -1319.0f, 30.0f));
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_CARSTEAL_GARAGE_S, 0, false, false);	// front (v_ilev_cs_door)
+		UnlockChopshopGarage();
 	}
 	else if (playerControl)
 	{
-		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(480.5f, -1319.0f, 30.0f));
+		DisableInterior(GET_INTERIOR_AT_COORDS(480.5f, -1319.0f, 30.0f));
 		UnloadIPL("v_chopshop");
 	}
 
@@ -365,16 +412,16 @@ void TequiLaLa()
 	if (!iniTequiLaLa)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -565.0f, 277.0f, 84.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -565.0f, 277.0f, 84.0f) < distance)
 	{
 		LoadIPL("v_rockclub");
-		EnableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-565.0f, 276.5f, 83.5f));
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(993120320, -565.1712f, 276.6259f, 83.28626f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_roc_door4)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(993120320, -561.2866f, 293.5044f, 87.77851f, false, 0.0f, 0.0f, 0.0f);	// rear (v_ilev_roc_door4)
+		EnableInterior(GET_INTERIOR_AT_COORDS(-565.0f, 276.5f, 83.5f));
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_TEQUILA_CLUB_DOOR_F, DOORSTATE_UNLOCKED, false, false);	// front (v_ilev_roc_door4)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_TEQUILA_CLUB_DOOR_R, DOORSTATE_UNLOCKED, false, false);	// rear (v_ilev_roc_door4)
 	}
 	else if (playerControl)
 	{
-		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-565.0f, 276.5f, 83.5f));
+		DisableInterior(GET_INTERIOR_AT_COORDS(-565.0f, 276.5f, 83.5f));
 		UnloadIPL("v_rockclub");
 	}
 
@@ -388,7 +435,7 @@ void FameorShame()
 	if (!iniFameorShame || !playerControl)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -262.0f, -2021.0f, 36.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -262.0f, -2021.0f, 36.0f) < distance)
 	{
 		UnloadIPL("sp1_10_fake_interior");
 		UnloadIPL("sp1_10_fake_interior_lod");
@@ -411,7 +458,7 @@ void CluckingBell()
 	if (!iniCluckingBell)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -71.0f, 6266.0f, 32.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -71.0f, 6266.0f, 32.0f) < distance)
 	{
 		UnloadIPL("cs1_02_cf_offmission");
 		UnloadIPL("cs1_02_cf_offmission_lod");
@@ -422,7 +469,7 @@ void CluckingBell()
 		LoadIPL("cs1_02_cf_onmission3_lod");
 		LoadIPL("cs1_02_cf_onmission4");
 		LoadIPL("cs1_02_cf_onmission4_lod");
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1156020871, -182.9104f, 6168.368f, 32.14053f, false, 0.0f, 0.0f, 0.0f);	// front (prop_fnclink_03gate5)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_CHICKENFACTORY_EXT_GATE, DOORSTATE_UNLOCKED, false, false);	// front (prop_fnclink_03gate5)
 	}
 	else if (playerControl)
 	{
@@ -445,17 +492,17 @@ void Foundry()
 	if (!iniFoundry)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1085.0f, -2000.0f, 35.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1085.0f, -2000.0f, 35.0f) < distance)
 	{
 		LoadIPL("v_foundry");
-		EnableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(1089.5f, -1995.5f, 33.0f));
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1428622127, 1083.547f, -1975.435f, 31.62222f, false, 0.0f, 0.0f, 0.0f);	// front (prop_ron_door_01)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1428622127, 1065.237f, -2006.079f, 32.23295f, false, 0.0f, 0.0f, 0.0f);	// rear (prop_ron_door_01)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1428622127, 1085.307f, -2018.561f, 41.62894f, false, 0.0f, 0.0f, 0.0f);	// rear (prop_ron_door_01)
+		EnableInterior(GET_INTERIOR_AT_COORDS(1089.5f, -1995.5f, 33.0f));
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_FOUNDRY_B_01, DOORSTATE_UNLOCKED, false, false);	// front (prop_ron_door_01)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_FOUNDRY_B_02, DOORSTATE_UNLOCKED, false, false);	// front (prop_ron_door_01)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_FOUNDRY_T_01, DOORSTATE_UNLOCKED, false, false);	// top (prop_ron_door_01)
 	}
 	else if (playerControl)
 	{
-		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(1089.5f, -1995.5f, 33.0f));
+		DisableInterior(GET_INTERIOR_AT_COORDS(1089.5f, -1995.5f, 33.0f));
 		UnloadIPL("v_foundry");
 	}
 
@@ -468,15 +515,15 @@ void EpsilonRoom()
 	if (!iniEpsilonRoom)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 241.0f, 361.0f, 106.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 241.0f, 361.0f, 106.0f) < distance)
 	{
 		LoadIPL("v_epsilonism");
-		EnableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(245.5f, 370.0f, 106.3f));
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1230442770, 241.3621f, 361.0471f, 105.8883f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_epsstoredoor)
+		EnableInterior(GET_INTERIOR_AT_COORDS(245.5f, 370.0f, 106.3f));
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_EPSILON2_STORAGE_ROOM, DOORSTATE_UNLOCKED, false, false);	// front (v_ilev_epsstoredoor)
 	}
 	else if (playerControl)
 	{
-		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(245.5f, 370.0f, 106.3f));
+		DisableInterior(GET_INTERIOR_AT_COORDS(245.5f, 370.0f, 106.3f));
 		UnloadIPL("v_epsilonism");
 	}
 
@@ -489,10 +536,10 @@ void JanitorHouse()
 	if (!iniJanitorHouse)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -108.0f, -9.0f, 71.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -108.0f, -9.0f, 71.0f) < distance)
 	{
 		LoadIPL("v_janitor");
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(486670049, -107.5373f, -9.018099f, 70.67085f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_janitor_frontdoor)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_JANITORS_APARTMENT, DOORSTATE_UNLOCKED, false, false);	// front (v_ilev_janitor_frontdoor)
 	}
 	else if (playerControl)
 		UnloadIPL("v_janitor");
@@ -503,7 +550,7 @@ void JanitorHouse()
 //O'Neil Ranch
 void ONeilRanch()
 {
-	if (!iniONeilRanch || (iniStoryCompatibility && (STREAMING::IS_IPL_ACTIVE("farm_burnt") || STREAMING::IS_IPL_ACTIVE("des_farmhs_endimap"))))
+	if (!iniONeilRanch || (iniStoryCompatibility && (IS_IPL_ACTIVE("farm_burnt") || IS_IPL_ACTIVE("des_farmhs_endimap"))))
 	{
 		BlipONeilRanch.enable = false;
 		UnloadIPL("farmint_cap");
@@ -511,7 +558,7 @@ void ONeilRanch()
 		return;
 	}
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 2445.0f, 4976.0f, 50.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 2445.0f, 4976.0f, 50.0f) < distance)
 	{
 		UnloadIPL("farmint_cap");
 		UnloadIPL("farmint_cap_lod");
@@ -543,20 +590,20 @@ void Scrapyard()
 	if (!iniScrapyard)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -605.0f, -1615.0f, 27.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -605.0f, -1615.0f, 27.0f) < distance)
 	{
 		LoadIPL("v_recycle");
-		EnableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-611.4f, -1615.7f, 29.2f));
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1099436502, -608.7289f, -1610.315f, 27.15894f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_rc_door3_l)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1627599682, -611.32f, -1610.089f, 27.15894f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_rc_door3_r)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1099436502, -592.9376f, -1631.577f, 27.15931f, false, 0.0f, 0.0f, 0.0f);	// rear (v_ilev_rc_door3_l)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1627599682, -592.7109f, -1628.986f, 27.15931f, false, 0.0f, 0.0f, 0.0f);	// rear (v_ilev_rc_door3_r)
+		EnableInterior(GET_INTERIOR_AT_COORDS(-611.4f, -1615.7f, 29.2f));
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_RECYCLING_PLANT_F_R, DOORSTATE_UNLOCKED, false, false);	// front (v_ilev_rc_door3_r)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_RECYCLING_PLANT_F_L, DOORSTATE_UNLOCKED, false, false);	// front (v_ilev_rc_door3_l)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_RECYCLING_PLANT_R_R, DOORSTATE_UNLOCKED, false, false);	// rear (v_ilev_rc_door3_r)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_RECYCLING_PLANT_R_L, DOORSTATE_UNLOCKED, false, false);	// rear (v_ilev_rc_door3_l)
 		DeleteObjectAtCoords(812467272, -589.5237f, -1621.55f, 33.16059f);		// internal (v_ilev_rc_door1_st)
 		DeleteObjectAtCoords(812467272, -590.8198f, -1621.436f, 33.16059f);		// internal (v_ilev_rc_door1_st)
 	}
 	else if (playerControl)
 	{
-		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-611.4f, -1615.7f, 29.2f));
+		DisableInterior(GET_INTERIOR_AT_COORDS(-611.4f, -1615.7f, 29.2f));
 		UnloadIPL("v_recycle");
 	}
 
@@ -569,12 +616,14 @@ void HumaneLab()
 	if (!iniHumaneLab)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 3625.0f, 3750.0f, 28.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 3625.0f, 3750.0f, 28.0f) < distance)
 	{
 		LoadIPL("v_lab");
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1081024910, 3620.843f, 3751.527f, 27.69009f, true, 0.0f, 0.0f, -1.0f);	// front (v_ilev_bl_shutter2)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1081024910, 3627.713f, 3746.716f, 27.69009f, true, 0.0f, 0.0f, -1.0f);	// front (v_ilev_bl_shutter2)
-		
+		DOOR_SYSTEM_SET_OPEN_RATIO(DOORHASH_CHEMICAL_FACTORY_R, -1.0f, false, false);	// front (v_ilev_bl_shutter2)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_CHEMICAL_FACTORY_R, DOORSTATE_LOCKED, false, false);
+		DOOR_SYSTEM_SET_OPEN_RATIO(DOORHASH_CHEMICAL_FACTORY_L, -1.0f, false, false);	// front (v_ilev_bl_shutter2)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_CHEMICAL_FACTORY_L, DOORSTATE_LOCKED, false, false);
+
 		if (missionFlag)
 			return;
 
@@ -594,10 +643,10 @@ void OmegaGarage()
 	if (!iniOmegaGarage)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 2333.0f, 2575.0f, 47.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 2333.0f, 2575.0f, 47.0f) < distance)
 	{
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-26664553, 2333.235f, 2574.973f, 47.03088f, false, 0.0f, 0.0f, 0.0f);	// front (prop_ch3_01_trlrdoor_l)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(914592203, 2329.655f, 2576.642f, 47.03088f, false, 0.0f, 0.0f, 0.0f);	// front (prop_ch3_01_trlrdoor_r)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_OMEGA_SHED_R, DOORSTATE_UNLOCKED, false, false);	// front (prop_ch3_01_trlrdoor_r)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_OMEGA_SHED_L, DOORSTATE_UNLOCKED, false, false);	// front (prop_ch3_01_trlrdoor_l)
 	}
 	return;
 }
@@ -608,12 +657,12 @@ void BlaineCountyBank()
 	if (!iniBlaineCountyBank)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -110.0f, 6462.0f, 32.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -110.0f, 6462.0f, 32.0f) < distance)
 	{
 		LoadIPL("v_bank4");
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1666470363, -109.65f, 6462.11f, 31.98499f, false, 0.0f, 0.0f, 0.0f);		// front (v_ilev_bank4door01)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-353187150, -111.48f, 6463.94f, 31.98499f, false, 0.0f, 0.0f, 0.0f);		// front  (v_ilev_bank4door02)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1184592117, -108.9147f, 6469.104f, 31.91028f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_cbankcountdoor01)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_RURAL_BANK_F_R, DOORSTATE_UNLOCKED, false, false);		// front (v_ilev_bank4door01)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_RURAL_BANK_F_L, DOORSTATE_UNLOCKED, false, false);		// front (v_ilev_bank4door02)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_PALETO_BANK_TELLER, DOORSTATE_UNLOCKED, false, false);	// internal (v_ilev_cbankcountdoor01)
 	}
 	else if (playerControl)
 	{
@@ -625,49 +674,30 @@ void BlaineCountyBank()
 //Dignity Yacht
 void DignityYacht()
 {
-	if (!iniDignityYacht)
+	if (!iniDignityYacht || IS_IPL_ACTIVE("smboat"))
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -2073.0f, -1024.0f, 4.0f) < 250000.0f)
-	{
-		LoadIPL("smboat");
-		LoadIPL("smboat_lod");
-		LoadIPL("smboat_lodlights");
-		LoadIPL("smboat_distantlights");
-	}
-	else if (playerControl)
-	{
-		UnloadIPL("smboat");
-		LoadIPL("smboat_lod");
-		LoadIPL("smboat_lodlights");
-		LoadIPL("smboat_distantlights");
-	}
+	LoadIPL("smboat");
+	LoadIPL("smboat_lod");
+	LoadIPL("smboat_lodlights");
+	LoadIPL("smboat_distantlights");
 	return;
 }
 
 //SS Bulker Container Ship
 void ContainerShip()
 {
-	if (!iniContainerShip || (iniStoryCompatibility && STREAMING::IS_IPL_ACTIVE("sunkcargoship")))
+	if (!iniContainerShip || (iniStoryCompatibility && (IS_IPL_ACTIVE("sunkcargoship") || IS_IPL_ACTIVE("sunk_ship_fire"))))
 	{
 		UnloadIPL("cargoship");
 		UnloadIPL("cargoship_lod");
 		return;
 	}
+	else if (IS_IPL_ACTIVE("cargoship"))
+		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -228.0f, -2366.0f, 17.0f) < 250000.0f)
-	{
-		UnloadIPL("sunkcargoship");
-		UnloadIPL("sunkcargoship_lod");
-		UnloadIPL("sunk_ship_fire");
-		LoadIPL("cargoship");
-		LoadIPL("cargoship_lod");
-	}
-	else if (playerControl)
-	{
-		UnloadIPL("cargoship");
-		LoadIPL("cargoship_lod");
-	}
+	LoadIPL("cargoship");
+	LoadIPL("cargoship_lod");
 	return;
 }
 
@@ -677,7 +707,7 @@ void UnionDepositoryVault()
 	if (!iniUnionDepository)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 15.0f, -690.0f, 35.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 15.0f, -690.0f, 35.0f) < distance)
 	{
 		LoadIPL("finbank");
 
@@ -685,13 +715,11 @@ void UnionDepositoryVault()
 			return;
 
 		Teleport(-0.1434f, -705.9488f, 15.1312f, -25.0f, 0.0f, 10.3384f, -671.1154f, 32.4495f, 240, 200, 80, 150, "Press ~INPUT_ENTER~ to enter the UD vault.", "Press ~INPUT_ENTER~ to exit the vault.", false);
-		OBJECT::SET_STATE_OF_CLOSEST_DOOR_OF_TYPE(-726591477, 11.656f, -668.4662f, 32.44926f, false, -1.0f, 0);		// internal (v_ilev_finelevdoor01)
-		OBJECT::SET_STATE_OF_CLOSEST_DOOR_OF_TYPE(-726591477, 8.760172f, -668.6967f, 32.44926f, false, -1.0f, 0);	// internal (v_ilev_finelevdoor01)
-		OBJECT::SET_STATE_OF_CLOSEST_DOOR_OF_TYPE(-726591477, 2.095137f, -704.072f, 15.13071f, false, -1.0f, 0);	// internal (v_ilev_finelevdoor01)
-		OBJECT::SET_STATE_OF_CLOSEST_DOOR_OF_TYPE(-726591477, -0.6344414f, -703.0778f, 15.13071f, false, -1.0f, 0);	// internal (v_ilev_finelevdoor01)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1932297301, -1.727947f, -686.5417f, 16.68913f, true, 0.0f, 0.0f, 1.0f);	// internal (v_ilev_fin_vaultdoor)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1011692606, 8.171528f, -672.4393f, 16.35861f, true, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fingate)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1011692606, -3.58445f, -668.1644f, 16.35861f, true, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fingate)
+		SetSlidingDoorsStateAtCoords(-726591477, 11.656f, -668.4662f, 32.44926f, 8.760172f, -668.6967f, 32.44926f, false, -1.0f, 2.25f, 2.75f);	// internal (v_ilev_finelevdoor01)
+		SetSlidingDoorsStateAtCoords(-726591477, 2.095137f, -704.072f, 15.13071f, -0.6344414f, -703.0778f, 15.13071f, false, -1.0f, 2.25f, 2.75f);	// internal (v_ilev_finelevdoor01)
+		SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1932297301, -1.727947f, -686.5417f, 16.68913f, true, 0.0f, 0.0f, 1.0f);	// internal (v_ilev_fin_vaultdoor)
+		SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1011692606, 8.171528f, -672.4393f, 16.35861f, true, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fingate)
+		SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1011692606, -3.58445f, -668.1644f, 16.35861f, true, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_fingate)
 	}
 	else if (playerControl && !missionFlag)
 		UnloadIPL("finbank");
@@ -705,15 +733,15 @@ void UnionDepositoryParking()
 	if (!iniUnionDepository)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -16.0f, -685.00f, 34.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -16.0f, -685.00f, 34.0f) < distance)
 	{
 		UnloadIPL("dt1_03_shutter");
 		LoadIPL("dt1_03_carpark");
-		EnableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-16.0f, -685.00f, 34.0f));
+		EnableInterior(GET_INTERIOR_AT_COORDS(-16.0f, -685.00f, 34.0f));
 	}
 	else if (playerControl)
 	{
-		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-16.0f, -685.00f, 34.0f));
+		DisableInterior(GET_INTERIOR_AT_COORDS(-16.0f, -685.00f, 34.0f));
 		UnloadIPL("dt1_03_carpark");
 		LoadIPL("dt1_03_shutter");
 	}
@@ -726,18 +754,20 @@ void Slaughterhouse()
 	if (!iniSlaughterhouse)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 994.0f, -2143.0f, 31.5f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 994.0f, -2143.0f, 31.5f) < distance)
 	{
 		LoadIPL("v_abattoir");
-		EnableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(981.0f, -2186.0f, 32.1f));
+		EnableInterior(GET_INTERIOR_AT_COORDS(981.0f, -2186.0f, 32.1f));
 
 		//Behaviour taken from decompiled scripts
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1755793225, 962.0066f, -2183.816f, 31.06194f, true, 0.0f, 0.0f, 1.0f);	// front (v_ilev_abbmaindoor)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1468417022, 962.9085f, -2105.813f, 34.20225f, true, 0.0f, 0.0f, 1.0f);	// rear (prop_abat_slide)
+		DOOR_SYSTEM_SET_OPEN_RATIO(DOORHASH_ABBATOIR_FRONT_L, 1.0f, false, false);				// front (v_ilev_abbmaindoor)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_ABBATOIR_FRONT_L, DOORSTATE_LOCKED, false, false);
+		DOOR_SYSTEM_SET_OPEN_RATIO(DOORHASH_ABATTOIR_EXIT, 1.0f, false, false);					// rear (prop_abat_slide)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_ABATTOIR_EXIT, DOORSTATE_LOCKED, false, false);
 	}
 	else if (playerControl)
 	{
-		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(981.0f, -2186.0f, 32.1f));
+		DisableInterior(GET_INTERIOR_AT_COORDS(981.0f, -2186.0f, 32.1f));
 		UnloadIPL("v_abattoir");
 	}
 
@@ -750,20 +780,20 @@ void SolomonOffice()
 	if (!iniSolomonOffice)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -1007.14f, -478.53f, 51.57f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -1007.14f, -478.53f, 51.57f) < distance)
 	{
 		LoadIPL("v_58_sol_office");
-		EnableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-1007.14f, -478.53f, 51.57f));
+		EnableInterior(GET_INTERIOR_AT_COORDS(-1007.14f, -478.53f, 51.57f));
 		
 		if (missionFlag)
 			return;
 
 		Teleport(-1002.9615f, -477.8428f, 49.0271f, 120.0f, 120.0f, -1011.6970f, -480.1367f, 38.9756f, 240, 200, 80, 150, "Press ~INPUT_ENTER~ to enter Solomon's office.", "Press ~INPUT_ENTER~ to exit the office.", false);
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2030220382, -1002.147f, -478.0642f, 50.11668f, true, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_sol_off_door01)
+		SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2030220382, -1002.147f, -478.0642f, 50.11668f, true, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_sol_off_door01)
 	}
 	else if (playerControl && !missionFlag)
 	{
-		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-1007.14f, -478.53f, 51.57f));
+		DisableInterior(GET_INTERIOR_AT_COORDS(-1007.14f, -478.53f, 51.57f));
 		UnloadIPL("v_58_sol_office");
 	}
 
@@ -773,10 +803,11 @@ void SolomonOffice()
 //Ace Liquor (Meth lab)
 void Methlab()
 {
-	if (iniMethlab && SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1393.0f, 3599.5f, 35.0f) < distance)
+	if (iniMethlab && VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1393.0f, 3599.5f, 35.0f) < distance)
 	{
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1212951353, 1392.927f, 3599.469f, 35.13078f, false, 0.0f, 0.0f, 0.0f);	// external (v_ilev_ml_door1)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1212951353, 1395.371f, 3600.358f, 35.13078f, false, 0.0f, 0.0f, 0.0f);	// external (v_ilev_ml_door1)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_METHLAB_F_R, DOORSTATE_UNLOCKED, false, false);	// front (v_ilev_ml_door1)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_METHLAB_F_L, DOORSTATE_UNLOCKED, false, false);	// front (v_ilev_ml_door1)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_METHLAB_R, DOORSTATE_UNLOCKED, false, false);	// rear (v_ilev_ss_door04)
 	}
 	return;
 }
@@ -787,19 +818,19 @@ void Morgue()
 	if (!iniMorgue)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 246.0f, -1374.0f, 32.5f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 246.0f, -1374.0f, 32.5f) < distance)
 	{
 		UnloadIPL("coroner_int_off");
 		LoadIPL("coroner_int_on");
 		LoadIPL("coronertrash");
-		EnableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(275.446f, -1361.11f, 24.5378f));
+		EnableInterior(GET_INTERIOR_AT_COORDS(275.446f, -1361.11f, 24.5378f));
 
 		if (!missionFlag)
 			Teleport(247.0606f, -1371.8202f, 23.5378f, -45.0f, 145.0f, 240.9777f, -1379.1080f, 32.7417f, 240, 200, 80, 150, "Press ~INPUT_ENTER~ to enter the LS County Morgue.", "Press ~INPUT_ENTER~ to exit the morgue.", false);
 	}
 	else if (playerControl && !missionFlag)
 	{
-		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(275.446f, -1361.11f, 24.5378f));
+		DisableInterior(GET_INTERIOR_AT_COORDS(275.446f, -1361.11f, 24.5378f));
 		UnloadIPL("coroner_int_on");
 		UnloadIPL("coronertrash");
 		LoadIPL("coroner_int_off");
@@ -814,13 +845,17 @@ void Motel()
 	if (!iniMotel)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1121.32f, 2642.65f, 39.17f) < distance || SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 151.3630f, -1007.6400f, -100.0000f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1121.32f, 2642.65f, 39.17f) < distance || VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 151.3630f, -1007.6400f, -100.0000f) < distance)
 	{
 		LoadIPL("v_motel_mp");
-		EnableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(152.2600f, -1004.4700f, -99.0000f));
+		EnableInterior(GET_INTERIOR_AT_COORDS(152.2600f, -1004.4700f, -99.0000f));
 
 		if (!missionFlag)
 			Teleport(151.3630f, -1007.6400f, -100.0000f, 0.0f, 0.0f, 1121.4703f, 2641.7883f, 37.1487f, 240, 200, 80, 150, "Press ~INPUT_ENTER~ to enter the The Motor Motel.", "Press ~INPUT_ENTER~ to exit the room.", false);
+	}
+	else if (playerControl)
+	{
+		DisableInterior(GET_INTERIOR_AT_COORDS(152.2600f, -1004.4700f, -99.0000f));
 	}
 	return;
 }
@@ -833,17 +868,17 @@ void PaletoSheriffOffice()
 	if (!iniPaletoSheriffOffice)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -445.0f, 6017.0f, 32.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -445.0f, 6017.0f, 32.0f) < distance)
 	{
 		UnloadIPL("cs1_16_sheriff_cap");
 		LoadIPL("v_sheriff2");
-		EnableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-447.0f, 6013.5f, 32.3f));
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1501157055, -444.4985f, 6017.06f, 31.86633f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_shrf2door)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1501157055, -442.66f, 6015.222f, 31.86633f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_shrf2door)
+		EnableInterior(GET_INTERIOR_AT_COORDS(-447.0f, 6013.5f, 32.3f));
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_SHERIFF_FRONT_R, DOORSTATE_UNLOCKED, false, false);	// front (v_ilev_shrf2door)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_SHERIFF_FRONT_L, DOORSTATE_UNLOCKED, false, false);	// front (v_ilev_shrf2door)
 	}
 	else if (playerControl)
 	{
-		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-447.0f, 6013.5f, 32.3f));
+		DisableInterior(GET_INTERIOR_AT_COORDS(-447.0f, 6013.5f, 32.3f));
 		UnloadIPL("v_sheriff2");
 		LoadIPL("cs1_16_sheriff_cap");
 	}
@@ -856,16 +891,16 @@ void SandySheriffOffice()
 	if (!iniSandySheriffOffice)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1856.0f, 3684.0f, 35.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1856.0f, 3684.0f, 35.0f) < distance)
 	{
 		UnloadIPL("sheriff_cap");
 		LoadIPL("v_sheriff");
-		EnableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(1853.0f, 3688.0f, 35.0f));
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1765048490, 1855.685f, 3683.93f, 34.59282f, false, 0.0f, 0.0f, 0.0f);	// front (v_ilev_shrfdoor)
+		EnableInterior(GET_INTERIOR_AT_COORDS(1853.0f, 3688.0f, 35.0f));
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_SHERIFF_CS4, DOORSTATE_UNLOCKED, false, false);	// front (v_ilev_shrfdoor)
 	}
 	else if (playerControl)
 	{
-		DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(1853.0f, 3688.0f, 35.0f));
+		DisableInterior(GET_INTERIOR_AT_COORDS(1853.0f, 3688.0f, 35.0f));
 		UnloadIPL("v_sheriff");
 		LoadIPL("sheriff_cap");
 	}
@@ -878,10 +913,10 @@ void PoliceStationRooms()
 	if (!iniPoliceStationRooms)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 447.0f, -980.0f, 31.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 447.0f, -980.0f, 31.0f) < distance)
 	{
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1320876379, 446.5728f, -980.0104f, 30.8393f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_ph_gendoor002)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(749848321, 453.0793f, -983.1894f, 30.83926f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_arm_secdoor)
+		SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1320876379, 446.5728f, -980.0104f, 30.8393f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_ph_gendoor002)
+		SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(749848321, 453.0793f, -983.1894f, 30.83926f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_arm_secdoor)
 	}
 	return;
 }
@@ -892,7 +927,7 @@ void YanktonSurveillance()
 	if (!iniYanktonSurveillance)
 		return;
 
-	OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-311575617, 5305.461f, -5177.75f, 83.66856f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_cd_door3)
+	SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-311575617, 5305.461f, -5177.75f, 83.66856f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_cd_door3)
 	return;
 }
 
@@ -902,11 +937,12 @@ void PacificBankVault()
 	if (!iniPacificBankVault)
 		return;
 
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 266.0f, 217.6f, 110.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 266.0f, 217.6f, 110.0f) < distance)
 	{
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1956494919, 266.3624f, 217.5697f, 110.4328f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_bk_door)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1246222793, 256.3116f, 220.6579f, 106.4296f, false, 0.0f, 0.0f, 0.0f);	// internal (v_ilev_bk_gate)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(961976194, 255.2283f, 223.976f, 102.3932f, true, 0.0f, 0.0f, -0.95f);		// internal (v_ilev_bk_vaultdoor)
+
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_BANK_VINEWOOD_OFFICE, DOORSTATE_UNLOCKED, false, false);	// internal (v_ilev_bk_door)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_BANK_VINEWOOD_TELLER, DOORSTATE_UNLOCKED, false, false);	// internal (v_ilev_bk_gate)
+		SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(961976194, 255.2283f, 223.976f, 102.3932f, true, 0.0f, 0.0f, -0.95f);		// internal (v_ilev_bk_vaultdoor)
 	}
 	return;
 }
@@ -918,45 +954,45 @@ void FleecaBanks()
 		return;
 
 	//Fleeca Bank - Blaine County
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1179.0f, 2709.0f, 38.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1179.0f, 2709.0f, 38.0f) < distance)
 	{
-		ENTITY::SET_ENTITY_ROTATION(OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(1178.87f, 2709.365f, 38.36251f, 0.3f, -131754413, false, true, true), 0.0f, 0.0f, 0.0f, 2, true);		// internal
-		ENTITY::SET_ENTITY_ROTATION(OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(1175.542f, 2710.861f, 38.22689f, 0.3f, 2121050683, false, true, true), 0.0f, 0.0f, 0.0f, 2, true);		// internal
+		SetObjectYawAtCoords(-131754413, 1178.87f, 2709.365f, 38.36251f, 0.0f);			// internal
+		SetObjectYawAtCoords(2121050683, 1175.542f, 2710.861f, 38.22689f, 0.0f);		// internal
 	}
 
 	//Fleeca Bank - Los Santos County
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -2960.0f, 479.0f, 16.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -2960.0f, 479.0f, 16.0f) < distance)
 	{
-		ENTITY::SET_ENTITY_ROTATION(OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(-2960.176f, 479.0105f, 15.97156f, 0.3f, -131754413, false, true, true), 0.0f, 0.0f, -90.0f, 2, true);	// internal
-		ENTITY::SET_ENTITY_ROTATION(OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(-2958.538f, 482.2705f, 15.83594f, 0.3f, 2121050683, false, true, true), 0.0f, 0.0f, -90.0f, 2, true);	// internal
+		SetObjectYawAtCoords(-131754413, -2960.176f, 479.0105f, 15.97156f, -90.0f);		// internal
+		SetObjectYawAtCoords(2121050683, -2958.538f, 482.2705f, 15.83594f, -90.0f);		// internal
 	}
 
 	//Fleeca Bank - Burton
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 310.0f, -280.0f, 54.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 310.0f, -280.0f, 54.0f) < distance)
 	{
-		ENTITY::SET_ENTITY_ROTATION(OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(309.7491f, -280.1797f, 54.43926, 0.3f, -131754413, false, true, true), 0.0f, 0.0f, 160.0f, 2, true);		// internal
-		ENTITY::SET_ENTITY_ROTATION(OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(312.358f, -282.7301f, 54.30365, 0.3f, 2121050683, false, true, true), 0.0f, 0.0f, 160.0f, 2, true);		// internal
+		SetObjectYawAtCoords(-131754413, 309.7491f, -280.1797f, 54.43926f, 160.0f);		// internal
+		SetObjectYawAtCoords(2121050683, 312.358f, -282.7301f, 54.30365f, 160.0f);		// internal
 	}
 
 	//Fleeca Bank - Alta
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -355.0f, -51.0f, 49.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -355.0f, -51.0f, 49.0f) < distance)
 	{
-		ENTITY::SET_ENTITY_ROTATION(OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(-355.3892f, -51.06768f, 49.31105f, 0.3f, -131754413, false, true, true), 0.0f, 0.0f, 160.0f, 2, true);	// internal
-		ENTITY::SET_ENTITY_ROTATION(OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(-352.7365f, -53.57248f, 49.17543f, 0.3f, 2121050683, false, true, true), 0.0f, 0.0f, 160.0f, 2, true);	// internal
+		SetObjectYawAtCoords(-131754413, -355.3892f, -51.06768f, 49.31105f, 160.0f);	// internal
+		SetObjectYawAtCoords(2121050683, -352.7365f, -53.57248f, 49.17543f, 160.0f);	// internal
 	}
 
 	//Fleeca Bank - Rockford Hills
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -1215.0f, -335.0f, 38.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -1215.0f, -335.0f, 38.0f) < distance)
 	{
-		ENTITY::SET_ENTITY_ROTATION(OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(-1214.906f, -334.7281f, 38.05551f, 0.3f, -131754413, false, true, true), 0.0f, 0.0f, -150.0f, 2, true);	// internal
-		ENTITY::SET_ENTITY_ROTATION(OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(-1211.261f, -334.5596f, 37.91989f, 0.3f, 2121050683, false, true, true), 0.0f, 0.0f, -150.0f, 2, true);	// internal
+		SetObjectYawAtCoords(-131754413, -1214.906f, -334.7281f, 38.05551f, -150.0f);	// internal
+		SetObjectYawAtCoords(2121050683, -1211.261f, -334.5596f, 37.91989f, -150.0f);	// internal
 	}
 
 	//Fleeca Bank - Pillbox Hill
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 145.6f, -1042.0f, 30.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 145.6f, -1042.0f, 30.0f) < distance)
 	{
-		ENTITY::SET_ENTITY_ROTATION(OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(145.4186f, -1041.813f, 29.64255f, 0.3f, -131754413, false, true, true), 0.0f, 0.0f, 160.0f, 2, true);	// internal
-		ENTITY::SET_ENTITY_ROTATION(OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(148.0266f, -1044.364f, 29.50693f, 0.3f, 2121050683, false, true, true), 0.0f, 0.0f, 160.0f, 2, true);	// internal
+		SetObjectYawAtCoords(-131754413, 145.4186f, -1041.813f, 29.64255f, 160.0f);		// internal
+		SetObjectYawAtCoords(2121050683, 148.0266f, -1044.364f, 29.50693f, 160.0f);		// internal
 	}
 	// v_ilev_gb_teldr			-131754413
 	// v_ilev_gb_vauldr			2121050683
@@ -971,70 +1007,119 @@ void Misc()
 		return;
 
 	//Los Santos Naval Port Gates (Merryweather's Dock)
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 492.0f, -3116.0f, 5.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 492.0f, -3116.0f, 5.0f) < distance)
 	{
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1286392437, 492.2758f, -3115.934f, 5.162354f, false, 0.0f, 0.0f, 0.0f);	// internal (prop_gate_docks_ld)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1286392437, 476.3276f, -3115.925f, 5.162354f, false, 0.0f, 0.0f, 0.0f);	// internal (prop_gate_docks_ld)
+		DOOR_SYSTEM_SET_DOOR_STATE(AUTODOOR_MIL_DOCKS_GATE_IN, DOORSTATE_UNLOCKED, false, false);	// internal (prop_gate_docks_ld)
+		DOOR_SYSTEM_SET_DOOR_STATE(AUTODOOR_MIL_DOCKS_GATE_OUT, DOORSTATE_UNLOCKED, false, false);	// internal (prop_gate_docks_ld)
 	}
 
 	//Vanilla Unicorn Back Door
-	OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(668467214, 96.09197f, -1284.854f, 29.43878f, false, 0.0f, 0.0f, 0.0f);		// internal (prop_magenta_door)
+	DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_STRIPCLUB_R, DOORSTATE_UNLOCKED, false, false);				// rear (prop_magenta_door)
 
 	//Pier 400 Gates
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -150.0f, -2570.0f, 5.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -150.0f, -2570.0f, 5.0f) < distance)
 	{
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1286392437, 19.4045f, -2529.702f, 5.047173f, false, 0.0f, 0.0f, 0.0f);	// external (prop_gate_docks_ld)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1286392437, 10.64414f, -2542.213f, 5.047173f, false, 0.0f, 0.0f, 0.0f);	// external (prop_gate_docks_ld)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1286392437, -202.6151f, -2515.309f, 5.047173f, false, 0.0f, 0.0f, 0.0f);	// external (prop_gate_docks_ld)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1286392437, -187.3406f, -2515.309f, 5.047173f, false, 0.0f, 0.0f, 0.0f);	// external (prop_gate_docks_ld)
-		SetDoorUnlockDistanceWithRate(569833973, -160.8777f, -2636.198f, 5.025181f, 1.0f, 15.15f);	// external (prop_facgate_01)
-		SetDoorUnlockDistanceWithRate(569833973, -148.7143f, -2636.198f, 5.032078f, 1.0f, 15.15f);	// external (prop_facgate_01)
+		DOOR_SYSTEM_SET_DOOR_STATE(AUTODOOR_DOCKS_FRONT_GATE_IN, DOORSTATE_UNLOCKED, false, false);		// external (prop_gate_docks_ld)
+		DOOR_SYSTEM_SET_DOOR_STATE(AUTODOOR_DOCKS_FRONT_GATE_OUT, DOORSTATE_UNLOCKED, false, false);	// external (prop_gate_docks_ld)
+		DOOR_SYSTEM_SET_DOOR_STATE(AUTODOOR_DOCKS_BACK_GATE_IN, DOORSTATE_UNLOCKED, false, false);		// external (prop_gate_docks_ld)
+		DOOR_SYSTEM_SET_DOOR_STATE(AUTODOOR_DOCKS_BACK_GATE_OUT, DOORSTATE_UNLOCKED, false, false);		// external (prop_gate_docks_ld)
 	}
 
 	//Garage Near Union Depository
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -33.80561f, -621.6387f, 36.06102f) < distance)
-		AltUnlockDoor(-190780785, -33.80561f, -621.6387f, 36.06102f);	// front (prop_com_gar_door_01)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -33.80561f, -621.6387f, 36.06102f) < distance)
+		SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-190780785, -33.80561f, -621.6387f, 36.06102f, false, 1.5f, 0.0f, 0.0f);	// front (prop_com_gar_door_01)
 
 	//Garage in front of "Alpha Mail Couriers"
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1204.555f, -3110.386f, 6.557831f) < distance)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-190780785, 1204.555f, -3110.386f, 6.557831f, false, 0.0f, 0.0f, 0.0f);	// external (prop_com_gar_door_01)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1204.555f, -3110.386f, 6.557831f) < distance)
+		SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-190780785, 1204.555f, -3110.386f, 6.557831f, false, 0.0f, 0.0f, 0.0f);	// external (prop_com_gar_door_01)
 
 	//Impound Lot  (Mission Row)
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 431.0f, -1001.0f, 27.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 431.0f, -1001.0f, 27.0f) < distance)
 	{
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-190780785, 431.4056f, -1001.169f, 26.71261f, false, 0.0f, 0.0f, 0.0f);	// external (prop_com_gar_door_01)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-190780785, 436.2234f, -1001.169f, 26.71261f, false, 0.0f, 0.0f, 0.0f);	// external (prop_com_gar_door_01)
+		DOOR_SYSTEM_SET_DOOR_STATE(AUTODOOR_IMPOUND_R, DOORSTATE_UNLOCKED, false, false);	// external (prop_com_gar_door_01) 
+		DOOR_SYSTEM_SET_DOOR_STATE(AUTODOOR_IMPOUND_L, DOORSTATE_UNLOCKED, false, false);	// external (prop_com_gar_door_01)
 	}
 
-	//Vinewood Hills Garage
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -689.1114f, 506.9815f, 110.6122f) < distance)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(913904359, -689.1114f, 506.9815f, 110.6122f, false, 0.0f, 0.0f, 0.0f);	// external (prop_ch2_09c_garage_door)
+	//Epsilon Vinewood Hills Garage
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -689.1114f, 506.9815f, 110.6122f) < distance)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_EPSILON3_GARAGE, DOORSTATE_UNLOCKED, false, false);	// external (prop_ch2_09c_garage_door)
 
 	//Stab City Trailer
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 29.0f, 3661.5f, 41.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 29.0f, 3661.5f, 41.0f) < distance)
 	{
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(668467214, 29.10205f, 3661.489f, 40.85468f, false, 0.0f, 0.0f, 0.0f);		// external (prop_magenta_door)
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1342464176, 31.91804f, 3666.854f, 40.85857f, false, 0.0f, 0.0f, 0.0f);	// external (prop_cs4_05_tdoor)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_HENCHMAN_TRAILER_L, DOORSTATE_UNLOCKED, false, false);	// external (prop_magenta_door)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_HENCHMAN_TRAILER_R, DOORSTATE_UNLOCKED, false, false);	// external (prop_cs4_05_tdoor)
 	}
 
 	//Vagos doors near the beach
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -1100.0f, -1638.5f, 5.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -1100.0f, -1638.5f, 5.0f) < distance)
 	{
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-502195954, -1104.657f, -1638.481f, 4.675404f, false, 0.0f, 0.0f, 0.0f);		// external (prop_map_door_01)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_ARM2_HENCH_01, DOORSTATE_UNLOCKED, false, false);	// external (prop_map_door_01)
 		//Repossession Garages Fix
 		if (!missionFlag)
 		{
-			OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2029892494, -1127.104f, -1586.979f, 5.092136f, false, 0.0f, 0.0f, 0.0f);	// external (prop_arm_gate_l)
-			OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2029892494, -1131.989f, -1590.397f, 5.092136f, false, 0.0f, 0.0f, 0.0f);	// external (prop_arm_gate_l)
-			OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1652821467, -1067.011f, -1665.597f, 4.789768f, false, 0.0f, 0.0f, 0.0f);	// external (prop_gar_door_01)
-			OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1013329911, -1064.759f, -1668.76f, 4.789768f, false, 0.0f, 0.0f, 0.0f);	// external (prop_gar_door_02)
+			SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2029892494, -1127.104f, -1586.979f, 5.092136f, false, 0.0f, 0.0f, 0.0f);	// external (prop_arm_gate_l)
+			SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-2029892494, -1131.989f, -1590.397f, 5.092136f, false, 0.0f, 0.0f, 0.0f);	// external (prop_arm_gate_l)
+			DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_ARM2_GARAGE_01, DOORSTATE_UNLOCKED, false, false);	// external (prop_gar_door_01)
+			DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_ARM2_GARAGE_02, DOORSTATE_UNLOCKED, false, false);	// external (prop_gar_door_02)
 		}
 	}
 
 	//LSPD Auto Impound Gate
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 375.9481f, -1632.531f, 27.24899f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 375.9481f, -1632.531f, 27.24899f) < distance)
 		DeleteObjectAtCoords(-577103870, 375.9481f, -1632.531f, 27.24899f);	// external (prop_sec_gate_01c)
 
+	//Josh Bernstein's House Gates
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -1119.335f, 292.975f, 66.5f) < distance)
+	{
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_JOSH_GATE_F_R, DOORSTATE_UNLOCKED, false, false);	// external (prop_lrggate_01c_r)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_JOSH_GATE_F_L, DOORSTATE_UNLOCKED, false, false);	// external (prop_lrggate_01c_l)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_JOSH_GATE_R_R, DOORSTATE_UNLOCKED, false, false);	// external (prop_lrggate_01c_r)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_JOSH_GATE_R_L, DOORSTATE_UNLOCKED, false, false);	// external (prop_lrggate_01c_l)
+	}
+
+	//Epsilon Center Gates
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -725.095f, 89.825f, 56.68f) < distance)
+	{
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_EPSILON_GATE_R, DOORSTATE_UNLOCKED, false, false);	// external (prop_gate_tep_01_r)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_EPSILON_GATE_L, DOORSTATE_UNLOCKED, false, false);	// external (prop_gate_tep_01_l)
+	}
+
+	//Cletus Ewing's House Gate
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1803.94f, 3929.01f, 33.72f) < distance)
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_CLETUS_GATE, DOORSTATE_UNLOCKED, false, false);	// external (prop_fnclink_07gate1)
+	return;
+}
+
+void Gates()
+{
+	if (!iniGates)
+		return;
+
+	SetSingleSlidingDoorStateAtCoords(prop_facgate_01, 1012.908f, -2456.231f, 27.52899f, -3.0f, 0.0f, false, 1.0f, gatesMinDist, gatesAltMaxDist);
+	SetSingleSlidingDoorStateAtCoords(prop_facgate_01, 1000.681f, -2454.992f, 27.56737f, -3.0f, 0.0f, false, 1.0f, gatesMinDist, gatesAltMaxDist);
+	SetSingleSlidingDoorStateAtCoords(prop_facgate_01, 1028.076f, -2364.72f, 29.5156f, -3.0f, 0.0f, false, 1.0f, gatesMinDist, gatesAltMaxDist);
+	SetSingleSlidingDoorStateAtCoords(prop_facgate_01, 1033.22f, -2299.096f, 29.5156f, -3.0f, 0.0f, false, 1.0f, gatesMinDist, gatesAltMaxDist);
+	SetSingleSlidingDoorStateAtCoords(prop_facgate_01, 1022.367f, -2417.209f, 28.39544f, -3.0f, 0.0f, false, 1.0f, gatesMinDist, gatesAltMaxDist);
+	SetSlidingDoorsStateAtCoords(prop_facgate_01, 705.6044f, -1319.417f, 24.89731f, 712.9515f, -1329.419f, 24.93871f, false, 1.0f, gatesMinDist, gatesMaxDist);
+	SetSingleSlidingDoorStateAtCoords(prop_facgate_01, 987.5148f, -1176.826f, 24.5557f, -3.0f, 0.0f, false, 1.0f, gatesMinDist, gatesAltMaxDist);
+	SetSpecialGatesStateAtCoords(prop_facgate_01, prop_facgate_01b, 796.4732f, -921.7579f, 24.54157f, 795.7961f, -909.2122f, 24.40896f, false, 1.0f, gatesMinDist, gatesMaxDist);
+	SetSpecialGatesStateAtCoords(prop_facgate_01, prop_facgate_01b, 795.0599f, -896.7894f, 24.28326f, 794.4017f, -884.3021f, 24.12696f, false, 1.0f, gatesMinDist, gatesMaxDist);
+	SetSlidingDoorsStateAtCoords(prop_facgate_01, -160.8777f, -2636.198f, 5.025181f, -148.7143f, -2636.198f, 5.032078f, false, 1.0f, gatesMinDist, gatesMaxDist);
+	SetSlidingDoorsStateAtCoords(prop_facgate_01, 155.318f, -2619.044f, 5.013092f, 167.4531f, -2619.572f, 5.013092f, false, 1.0f, gatesMinDist, gatesMaxDist);
+	SetSingleSlidingDoorStateAtCoords(prop_facgate_01, 237.7759f, -2936.957f, 4.968819f, -3.0f, 0.0f, false, 1.0f, gatesMinDist, gatesAltMaxDist);
+	SetSpecialGatesStateAtCoords(prop_facgate_01, prop_facgate_01b, 117.7632f, -1609.619f, 28.3253f, 107.1967f, -1615.722f, 28.32404f, false, 1.0f, gatesMinDist, gatesMaxDist);
+	SetSlidingDoorsStateAtCoords(prop_facgate_01, 547.9453f, -1865.052f, 24.35131f, 538.541f, -1872.845f, 24.35131f, false, 1.0f, gatesMinDist, gatesMaxDist);
+	SetSpecialGatesStateAtCoords(prop_facgate_01, prop_facgate_01b, 466.7599f, -1939.655f, 23.65514f, 455.7382f, -1944.846f, 23.65514f, false, 1.0f, gatesMinDist, gatesMaxDist);
+	SetSpecialGatesStateAtCoords(prop_facgate_01, prop_facgate_01b, 550.9767f, -1896.741f, 24.14621f, 539.9556f, -1901.955f, 24.2161f, false, 1.0f, gatesMinDist, gatesMaxDist);
+	SetSpecialGatesStateAtCoords(prop_facgate_01, prop_facgate_01b, 564.1142f, -1903.0f, 23.7104f, 570.6271f, -1913.332f, 23.7104f, false, 1.0f, gatesMinDist, gatesMaxDist);
+	SetSlidingDoorsStateAtCoords(prop_facgate_01, -994.4996f, -2341.648f, 12.94479f, -984.079f, -2348.4f, 12.94479f, false, 1.0f, gatesMinDist, gatesMaxDist);
+	SetSingleSlidingDoorStateAtCoords(prop_facgate_01, -1213.4f, -2079.3f, 12.90274f, -3.0f, 0.0f, false, 1.0f, gatesMinDist, gatesAltMaxDist);
+	SetSingleSlidingDoorStateAtCoords(prop_facgate_01, -1099.531f, -2020.803f, 12.17445f, -3.0f, 0.0f, false, 1.0f, gatesMinDist, gatesAltMaxDist);
+	SetSingleSlidingDoorStateAtCoords(prop_facgate_01, -1019.616f, -1897.02f, 13.41593f, -3.0f, 0.0f, false, 1.0f, gatesMinDist, gatesAltMaxDist);
+	SetSingleSlidingDoorStateAtCoords(prop_facgate_01, 2491.868f, -303.4783f, 91.99238f, -3.0f, 0.0f, false, 1.0f, gatesMinDist, gatesAltMaxDist);
+	SetSingleSlidingDoorStateAtCoords(prop_facgate_01, 1937.405f, -958.2576f, 78.15379f, -3.0f, 0.0f, false, 1.0f, gatesMinDist, gatesAltMaxDist);
+	SetSingleSlidingDoorStateAtCoords(prop_facgate_01b, 1954.208f, -957.1394f, 78.15379f, 3.0f, 0.0f, false, -1.0f, gatesMinDist, gatesAltMaxDist);
 	return;
 }
 
@@ -1078,20 +1163,18 @@ void ScenarioGroups()
 }
 
 ///////////////////////////////////////EXTRAS/////////////////////////////////////////
-
+//KEEP THIS UPDATED with the functions up here!!
 void UnlockDoors()
 {
-	//Michael's House Gate
-	if (iniMichaelHouse && PED::GET_PED_TYPE(PLAYER::PLAYER_PED_ID()) != 0)
-	{
-		SetDoorUnlockDistanceWithRate(-2125423493, -844.051f, 155.9619f, 66.03221f, 1.0f, 15.15f);
-	}
+	//Michael's House Gate and window
+	if (iniMichaelHouse)
+		SetAutoDoorState(AUTODOOR_MICHAEL_MANSION_GATE, DOORSTATE_UNLOCKED, 0.75f, 15.0f, true);
 
 	//Vangelico Jewelry Store doors
-	if (iniVangelico && !(iniStoryCompatibility && STREAMING::IS_IPL_ACTIVE("bh1_16_refurb")) && SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -630.0f, -238.0f, 38.0f) < distance)
+	if (iniVangelico && !(iniStoryCompatibility && IS_IPL_ACTIVE("bh1_16_refurb")) && VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -630.0f, -238.0f, 38.0f) < distance)
 	{
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(9467943, -630.4265f, -238.4375f, 38.20653f, false, 0.0f, 0.0f, 0.0f);
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1425919976, -631.9554f, -236.3333f, 38.20653f, false, 0.0f, 0.0f, 0.0f);
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_HEIST_JEWELERS_R, DOORSTATE_UNLOCKED, false, false);
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_HEIST_JEWELERS_L, DOORSTATE_UNLOCKED, false, false);
 	}
 
 	//FIB
@@ -1104,32 +1187,28 @@ void UnlockDoors()
 	}
 
 	//Chopshop
-	if (iniChopshop && SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 485.0f, -1315.0f, 30.0f) < distance)
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 485.0f, -1315.0f, 30.0f) < distance)
 	{
-		AltUnlockDoor(-664582244, 482.8112f, -1311.953f, 29.35057f);
-		if (!OBJECT::IS_DOOR_REGISTERED_WITH_SYSTEM(-190140885))
-		{
-			DeleteObjectAtCoords(-190780785, 484.5642f, -1315.574f, 30.20331f);
-			OBJECT::ADD_DOOR_TO_SYSTEM(-190140885, -190780785, 484.5642f, -1315.574f, 30.20331f, false, false, false);
-			OBJECT::DOOR_SYSTEM_SET_DOOR_STATE(-190140885, 0, false, false);
-		}
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_CARSTEAL_GARAGE_S, DOORSTATE_UNLOCKED, false, false);
+		UnlockChopshopGarage();
 	}
 
 	//Foundry
-	if (iniFoundry && SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1085.0f, -2000.0f, 35.0f) < distance)
+	if (iniFoundry && VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 1085.0f, -2000.0f, 35.0f) < distance)
 	{
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1428622127, 1083.547f, -1975.435f, 31.62222f, false, 0.0f, 0.0f, 0.0f);
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1428622127, 1065.237f, -2006.079f, 32.23295f, false, 0.0f, 0.0f, 0.0f);
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1428622127, 1085.307f, -2018.561f, 41.62894f, false, 0.0f, 0.0f, 0.0f);
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_FOUNDRY_B_01, DOORSTATE_UNLOCKED, false, false);
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_FOUNDRY_B_02, DOORSTATE_UNLOCKED, false, false);
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_FOUNDRY_T_01, DOORSTATE_UNLOCKED, false, false);
+
 	}
 
 	//Scrapyard
-	if (iniScrapyard && SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -605.0f, -1615.0f, 27.0f) < distance)
+	if (iniScrapyard && VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -605.0f, -1615.0f, 27.0f) < distance)
 	{
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1099436502, -608.7289f, -1610.315f, 27.15894f, false, 0.0f, 0.0f, 0.0f);
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1627599682, -611.32f, -1610.089f, 27.15894f, false, 0.0f, 0.0f, 0.0f);
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(1099436502, -592.9376f, -1631.577f, 27.15931f, false, 0.0f, 0.0f, 0.0f);
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-1627599682, -592.7109f, -1628.986f, 27.15931f, false, 0.0f, 0.0f, 0.0f);
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_RECYCLING_PLANT_F_R, DOORSTATE_UNLOCKED, false, false);
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_RECYCLING_PLANT_F_L, DOORSTATE_UNLOCKED, false, false);
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_RECYCLING_PLANT_R_R, DOORSTATE_UNLOCKED, false, false);
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_RECYCLING_PLANT_R_L, DOORSTATE_UNLOCKED, false, false);
 	}
 
 	//Humane Lab
@@ -1137,20 +1216,18 @@ void UnlockDoors()
 		Teleport(3540.6599f, 3675.5315f, 19.9918f, 170.0f, 170.0f, 3540.6272f, 3675.3850f, 27.1211f, 240, 200, 80, 150, "Press ~INPUT_ENTER~ to take the elevator.", "Press ~INPUT_ENTER~ to take the elevator.", false);
 
 	//Omega's Garage
-	if (iniOmegaGarage && SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 2333.0f, 2575.0f, 47.0f) < distance)
+	if (iniOmegaGarage && VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 2333.0f, 2575.0f, 47.0f) < distance)
 	{
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(-26664553, 2333.235f, 2574.973f, 47.03088f, false, 0.0f, 0.0f, 0.0f);
-		OBJECT::SET_LOCKED_UNSTREAMED_IN_DOOR_OF_TYPE(914592203, 2329.655f, 2576.642f, 47.03088f, false, 0.0f, 0.0f, 0.0f);
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_OMEGA_SHED_R, DOORSTATE_UNLOCKED, false, false);
+		DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_OMEGA_SHED_L, DOORSTATE_UNLOCKED, false, false);
 	}
 
 	//Union Depository Vault Doors
-	if (iniUnionDepository && !missionFlag && SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 15.0f, -690.0f, 35.0f) < distance)
+	if (iniUnionDepository && !missionFlag && VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, 15.0f, -690.0f, 35.0f) < distance)
 	{
 		Teleport(-0.1434f, -705.9488f, 15.1312f, -25.0f, 0.0f, 10.3384f, -671.1154f, 32.4495f, 240, 200, 80, 150, "Press ~INPUT_ENTER~ to enter the UD vault.", "Press ~INPUT_ENTER~ to exit the vault.", false);
-		OBJECT::SET_STATE_OF_CLOSEST_DOOR_OF_TYPE(-726591477, 11.656f, -668.4662f, 32.44926f, false, -1.0f, 0);
-		OBJECT::SET_STATE_OF_CLOSEST_DOOR_OF_TYPE(-726591477, 8.760172f, -668.6967f, 32.44926f, false, -1.0f, 0);
-		OBJECT::SET_STATE_OF_CLOSEST_DOOR_OF_TYPE(-726591477, 2.095137f, -704.072f, 15.13071f, false, -1.0f, 0);
-		OBJECT::SET_STATE_OF_CLOSEST_DOOR_OF_TYPE(-726591477, -0.6344414f, -703.0778f, 15.13071f, false, -1.0f, 0);
+		SetSlidingDoorsStateAtCoords(-726591477, 11.656f, -668.4662f, 32.44926f, 8.760172f, -668.6967f, 32.44926f, false, -1.0f, 2.25f, 2.75f);
+		SetSlidingDoorsStateAtCoords(-726591477, 2.095137f, -704.072f, 15.13071f, -0.6344414f, -703.0778f, 15.13071f, false, -1.0f, 2.25f, 2.75f);
 	}
 
 	//Solomon's Office
@@ -1168,5 +1245,68 @@ void UnlockDoors()
 	//Pacific Standard Public Deposit Bank Vault
 	PacificBankVault();
 
+	//Misc
+	if (iniMiscInteriors)
+	{		
+		//Epsilon Center Gates
+		if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -725.095f, 89.825f, 56.68f) < distance)
+		{
+			DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_EPSILON_GATE_R, DOORSTATE_UNLOCKED, false, false);	// external (prop_gate_tep_01_r)
+			DOOR_SYSTEM_SET_DOOR_STATE(DOORHASH_EPSILON_GATE_L, DOORSTATE_UNLOCKED, false, false);	// external (prop_gate_tep_01_l)
+		}
+	}
+	return;
+}
+
+void UnlockBarriersNearPlayer()
+{
+	if (!iniUnlockBarriersNearPlayer)
+		return;
+
+	//Squared because of VDIST2
+	const float minDist = 7.0f * 7.0f;
+	const float maxDist = 8.5f * 8.5f;
+	Object barrier = NULL;
+
+	Object barrier1 = OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(playerLoc.x, playerLoc.y, playerLoc.z, 20.0f, -1184516519, false, false, false);	//prop_sec_barrier_ld_01a
+	Object barrier2 = OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(playerLoc.x, playerLoc.y, playerLoc.z, 20.0f, 1230099731, false, false, false);	//prop_sec_barrier_ld_02a
+	bool barrier1Exists = DOES_ENTITY_EXIST(barrier1);
+	bool barrier2Exists = DOES_ENTITY_EXIST(barrier2);
+
+	//Choose the closest barrier if both exists
+	if (barrier1Exists && barrier2Exists)
+	{
+		Vector3 barrier1Loc = GET_ENTITY_COORDS(barrier1, false);
+		Vector3 barrier2Loc = GET_ENTITY_COORDS(barrier2, false);
+		float distance1 = VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, barrier1Loc.x, barrier1Loc.y, barrier1Loc.z);
+		float distance2 = VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, barrier2Loc.x, barrier2Loc.y, barrier2Loc.z);
+		if (distance1 < distance2)
+			barrier = barrier1;
+		else
+			barrier = barrier2;
+	}
+	else if (barrier1Exists)
+		barrier = barrier1;
+	else if (barrier2Exists)
+		barrier = barrier2;
+	else
+		return;
+
+	Vector3 coords = GET_ENTITY_COORDS(barrier, false);
+	float dist = VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, coords.x, coords.y, coords.z);
+	if (dist < minDist)
+	{
+		//Check if last barrier has been closed correctly before opening a new one
+		if (lastBarrier != barrier && DOES_ENTITY_EXIST(lastBarrier))
+		{
+			Vector3 lastBarrierLoc = GET_ENTITY_COORDS(lastBarrier, false);
+			SET_STATE_OF_CLOSEST_DOOR_OF_TYPE(GET_ENTITY_MODEL(lastBarrier), lastBarrierLoc.x, lastBarrierLoc.y, lastBarrierLoc.z, false, -1.0f, true);
+		}
+		SET_STATE_OF_CLOSEST_DOOR_OF_TYPE(GET_ENTITY_MODEL(barrier), coords.x, coords.y, coords.z, false, 1.0f, true);
+	}	
+	else if (dist > maxDist)
+		SET_STATE_OF_CLOSEST_DOOR_OF_TYPE(GET_ENTITY_MODEL(barrier), coords.x, coords.y, coords.z, false, -1.0f, true);
+
+	lastBarrier = barrier;
 	return;
 }

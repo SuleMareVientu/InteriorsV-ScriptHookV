@@ -19,15 +19,15 @@ static char* enterMsg = "Press ~INPUT_ENTER~ to enter the apartment.";
 static char* exitMsg = "Press ~INPUT_ENTER~ to exit the apartment.";
 
 //Low End Apartment Coords
-static const float xLow = 265.1470f;
-static const float yLow = -1002.541f;
-static const float zLow = -100.0087f;
+static const float xLow = 265.1292f;
+static const float yLow = -1000.950f;
+static const float zLow = -100.0086f;
 static const float lowHeading = 0.0f;
 
 //Medium End Apartment Coords
-static const float xMedium = 346.4946f;
-static const float yMedium = -1003.893f;
-static const float zMedium = -100.1962f;
+static const float xMedium = 346.5050f;
+static const float yMedium = -1002.471f;
+static const float zMedium = -100.2062f;
 static const float MediumHeading = 0.0f;
 
 static void LowEndApartments()
@@ -44,7 +44,7 @@ static void LowEndApartments()
 		Teleport(xLow, yLow, zLow, lowHeading, 130.0f, -813.2224f, -980.9390f, 13.1482f, R, G, B, A, enterMsg, exitMsg, true)		//0112 South Rockford Drive, Apt 13
 		)
 	{
-		int interior = INTERIOR::GET_INTERIOR_AT_COORDS(261.4586f, -998.8196f, -99.00863f);
+		int interior = GET_INTERIOR_AT_COORDS(261.4586f, -998.8196f, -99.00863f);
 		EnableInterior(interior);
 		EnableInteriorProp(interior, "Studio_Lo_Strip_C", false);
 		EnableInteriorProp(interior, "Studio_Lo_Booze_A", false);
@@ -71,7 +71,7 @@ static void MediumEndApartments()
 		Teleport(xMedium, yMedium, zMedium, MediumHeading, -5.0f, -197.6927f, 86.0134f, 68.7562f, R, G, B, A, enterMsg, exitMsg, true)			//The Royale, Apt 19
 		)
 	{
-		int interior = INTERIOR::GET_INTERIOR_AT_COORDS(347.2686f, -999.2955f, -99.19622f);
+		int interior = GET_INTERIOR_AT_COORDS(347.2686f, -999.2955f, -99.19622f);
 		EnableInterior(interior);
 		EnableInteriorProp(interior, "Apart_Mid_Strip_C", false);
 		EnableInteriorProp(interior, "Apart_Mid_Booze_A", false);
@@ -82,7 +82,7 @@ static void MediumEndApartments()
 
 static void EnableHighEndApartment(float x, float y, float z)
 {
-	int interior = INTERIOR::GET_INTERIOR_AT_COORDS(x, y, z);
+	int interior = GET_INTERIOR_AT_COORDS(x, y, z);
 	EnableInterior(interior);
 	EnableInteriorProp(interior, "Apart_Hi_Strip_A", false);
 	EnableInteriorProp(interior, "Apart_Hi_Booze_A", false);
@@ -151,61 +151,61 @@ void HighEndApartmentsCulling()
 	//Model culling works only for SPmap, this is NOT made for the MPmap
 	//Original model names can be found inside am_mp_property_int.c
 	
-	int currentInterior = INTERIOR::GET_INTERIOR_AT_COORDS(playerLoc.x, playerLoc.y, playerLoc.z);
+	int currentInterior = GET_INTERIOR_AT_COORDS(playerLoc.x, playerLoc.y, playerLoc.z);
 	if (!isInsideApartment || currentInterior == 0)
 	{
 		isInsideApartment = false;
 
 		//Eclipse Towers Apartments
-		if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -777.3174f, 312.8665f, 84.6982f) < distance)
+		if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -777.3174f, 312.8665f, 84.6982f) < distance)
 		{
-			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-797.5f, 335.31f, 207.29f));
-			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-755.5f, 318.52f, 222.61f));
-			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-801.29f, 336.86f, 159.42f));
-			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-758.99f, 319.74f, 175.97f));
+			DisableInterior(GET_INTERIOR_AT_COORDS(-797.5f, 335.31f, 207.29f));
+			DisableInterior(GET_INTERIOR_AT_COORDS(-755.5f, 318.52f, 222.61f));
+			DisableInterior(GET_INTERIOR_AT_COORDS(-801.29f, 336.86f, 159.42f));
+			DisableInterior(GET_INTERIOR_AT_COORDS(-758.99f, 319.74f, 175.97f));
 		}
 
 		//Weazel Plaza Apartments
-		if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -916.5256f, -450.6372f, 38.5999f) < distance)
+		if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -916.5256f, -450.6372f, 38.5999f) < distance)
 		{
-			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-889.31f, -450.9f, 126.21f));
-			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-906.66f, -439.15f, 121.21f));
-			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-891.68f, -434.44f, 95.98f));
+			DisableInterior(GET_INTERIOR_AT_COORDS(-889.31f, -450.9f, 126.21f));
+			DisableInterior(GET_INTERIOR_AT_COORDS(-906.66f, -439.15f, 121.21f));
+			DisableInterior(GET_INTERIOR_AT_COORDS(-891.68f, -434.44f, 95.98f));
 		}
 
 		//Tinsel Towers Apartments
-		if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -616.9627f, 37.4050f, 42.5870f) < distance)
+		if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -616.9627f, 37.4050f, 42.5870f) < distance)
 		{
-			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-586.9371f, 46.5519f, 92.2204f));
-			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-617.6090f, 63.0240f, 106.6243f));
+			DisableInterior(GET_INTERIOR_AT_COORDS(-586.9371f, 46.5519f, 92.2204f));
+			DisableInterior(GET_INTERIOR_AT_COORDS(-617.6090f, 63.0240f, 106.6243f));
 		}
 
 		//Richards Majestic
-		if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -937.5001f, -376.2820f, 37.9613f) < distance)
+		if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -937.5001f, -376.2820f, 37.9613f) < distance)
 		{
-			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-929.0226f, -379.9931f, 108.03774f));
-			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-905.5511f, -375.1243f, 84.0079f));
+			DisableInterior(GET_INTERIOR_AT_COORDS(-929.0226f, -379.9931f, 108.03774f));
+			DisableInterior(GET_INTERIOR_AT_COORDS(-905.5511f, -375.1243f, 84.0079f));
 		}
 
 		//4 Integrity Way Apartments
-		if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -47.9679f, -587.2177f, 36.9580f) < distance)
+		if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -47.9679f, -587.2177f, 36.9580f) < distance)
 		{
-			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-15.0248f, -590.8832f, 98.8302f));
-			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-36.1545f, -581.2134f, 88.7091f));
+			DisableInterior(GET_INTERIOR_AT_COORDS(-15.0248f, -590.8832f, 98.8302f));
+			DisableInterior(GET_INTERIOR_AT_COORDS(-36.1545f, -581.2134f, 88.7091f));
 		}
 
 		//3 Alta Street Tower Apartments
-		if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -262.5153f, -971.1097f, 30.2198f) < distance)
+		if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -262.5153f, -971.1097f, 30.2198f) < distance)
 		{
-			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-272.4795f, -940.1398f, 91.5109f));
-			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-270.7699f, -968.1721f, 76.2314f));
+			DisableInterior(GET_INTERIOR_AT_COORDS(-272.4795f, -940.1398f, 91.5109f));
+			DisableInterior(GET_INTERIOR_AT_COORDS(-270.7699f, -968.1721f, 76.2314f));
 		}
 
 		//Del Perro Heights Apartments
-		if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -1442.0504f, -545.0800f, 33.7418f) < distance)
+		if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -1442.0504f, -545.0800f, 33.7418f) < distance)
 		{
-			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-1451.538f, -523.6300f, 68.5566f));
-			DisableInterior(INTERIOR::GET_INTERIOR_AT_COORDS(-1451.538f, -523.6300f, 55.9290f));
+			DisableInterior(GET_INTERIOR_AT_COORDS(-1451.538f, -523.6300f, 68.5566f));
+			DisableInterior(GET_INTERIOR_AT_COORDS(-1451.538f, -523.6300f, 55.9290f));
 		}
 		return;
 	}
@@ -213,25 +213,25 @@ void HighEndApartmentsCulling()
 	char* pedScenario = "PROP_HUMAN_SEAT_CHAIR";
 
 	//Eclipse Towers Apartments culling
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -777.3174f, 312.8665f, 84.6982f) < distance &&
-		(currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-797.5f, 335.31f, 207.29f) ||	//Eclipse Towers, Apt 31
-		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-755.5f, 318.52f, 222.61f)	||	//Eclipse Towers, Apt 40
-		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-801.29f, 336.86f, 159.42f) ||	//Eclipse Towers, Apt 5
-		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-758.99f, 319.74f, 175.97f))	//Eclipse Towers, Apt 9
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -777.3174f, 312.8665f, 84.6982f) < distance &&
+		(currentInterior == GET_INTERIOR_AT_COORDS(-797.5f, 335.31f, 207.29f) ||	//Eclipse Towers, Apt 31
+		currentInterior == GET_INTERIOR_AT_COORDS(-755.5f, 318.52f, 222.61f)	||	//Eclipse Towers, Apt 40
+		currentInterior == GET_INTERIOR_AT_COORDS(-801.29f, 336.86f, 159.42f) ||	//Eclipse Towers, Apt 5
+		currentInterior == GET_INTERIOR_AT_COORDS(-758.99f, 319.74f, 175.97f))	//Eclipse Towers, Apt 9
 		)
 	{
 		EnableHighEndApartment(-797.5f, 335.31f, 207.29f);
 		EnableHighEndApartment(-755.5f, 318.52f, 222.61f);
 		EnableHighEndApartment(-801.29f, 336.86f, 159.42f);
 		EnableHighEndApartment(-758.99f, 319.74f, 175.97f);
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(1590383694);	//ss1_11_flats
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-1799920002);	//ss1_11_ss1_emissive_a
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(651180941);		//ss1_11_detail01b
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-1862254987);	//ss1_11_Flats_LOD
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(738827591);		//SS1_02_Building01_LOD
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(287959306);		//SS1_LOD_01_02_08_09_10_11
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(2064708988);	//SS1_02_SLOD1
-		GRAPHICS::DISABLE_OCCLUSION_THIS_FRAME();
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(1590383694);	//ss1_11_flats
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-1799920002);	//ss1_11_ss1_emissive_a
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(651180941);		//ss1_11_detail01b
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-1862254987);	//ss1_11_Flats_LOD
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(738827591);		//SS1_02_Building01_LOD
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(287959306);		//SS1_LOD_01_02_08_09_10_11
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(2064708988);	//SS1_02_SLOD1
+		DISABLE_OCCLUSION_THIS_FRAME();
 		DeleteScenarioPedAtCoords(-785.2530f, 334.0298f, 200.9106f, pedScenario);
 		DeleteScenarioPedAtCoords(-770.8542f, 323.2263f, 216.5474f, pedScenario);
 		DeleteScenarioPedAtCoords(-785.7202f, 334.4220f, 153.2912f, pedScenario);
@@ -239,99 +239,99 @@ void HighEndApartmentsCulling()
 	}
 
 	//Weazel Plaza Apartments culling
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -916.5256f, -450.6372f, 38.5999f) < distance &&
-		(currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-889.31f, -450.9f, 126.21f) ||	//Weazel Plaza, Apt 101
-		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-906.66f, -439.15f, 121.21f) ||	//Weazel Plaza, Apt 70
-		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-891.68f, -434.44f, 95.98f))	//Weazel Plaza, Apt 26
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -916.5256f, -450.6372f, 38.5999f) < distance &&
+		(currentInterior == GET_INTERIOR_AT_COORDS(-889.31f, -450.9f, 126.21f) ||	//Weazel Plaza, Apt 101
+		currentInterior == GET_INTERIOR_AT_COORDS(-906.66f, -439.15f, 121.21f) ||	//Weazel Plaza, Apt 70
+		currentInterior == GET_INTERIOR_AT_COORDS(-891.68f, -434.44f, 95.98f))	//Weazel Plaza, Apt 26
 		)
 	{
 		EnableHighEndApartment(-889.31f, -450.9f, 126.21f);
 		EnableHighEndApartment(-906.66f, -439.15f, 121.21f);
 		EnableHighEndApartment(-891.68f, -434.44f, 95.98f);
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(1359069635);	//bh1_09_bld_01
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(41930611);		//bh1_09_ema
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-200410159);	//prop_wall_light_12a
-		GRAPHICS::DISABLE_OCCLUSION_THIS_FRAME();
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(1359069635);	//bh1_09_bld_01
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(41930611);		//bh1_09_ema
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-200410159);	//prop_wall_light_12a
+		DISABLE_OCCLUSION_THIS_FRAME();
 		DeleteScenarioPedAtCoords(-896.5284f, -450.9871f, 119.8241f, pedScenario);
 		DeleteScenarioPedAtCoords(-901.8891f, -439.0873f, 114.8968f, pedScenario);
 		DeleteScenarioPedAtCoords(-893.1642f, -441.6309f, 88.7508f, pedScenario);
 	}
 
 	//Tinsel Towers Apartments culling
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -616.9627f, 37.4050f, 42.5870f) < distance &&
-		(currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-586.9371f, 46.5519f, 92.2204f) ||	//Tinsel Towers, Apt 29
-		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-617.6090f, 63.0240f, 106.6243f))	//Tinsel Towers, Apt 45
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -616.9627f, 37.4050f, 42.5870f) < distance &&
+		(currentInterior == GET_INTERIOR_AT_COORDS(-586.9371f, 46.5519f, 92.2204f) ||	//Tinsel Towers, Apt 29
+		currentInterior == GET_INTERIOR_AT_COORDS(-617.6090f, 63.0240f, 106.6243f))	//Tinsel Towers, Apt 45
 		)
 	{
 		EnableHighEndApartment(-586.9371f, 46.5519f, 92.2204f);
 		EnableHighEndApartment(-617.6090f, 63.0240f, 106.6243f);
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-1426709080);	//ss1_02_building01
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(253211729);		//SS1_Emissive_SS1_02a_LOD
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-500045280);	//ss1_02_ss1_emissive_ss1_02
-		GRAPHICS::DISABLE_OCCLUSION_THIS_FRAME();
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-1426709080);	//ss1_02_building01
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(253211729);		//SS1_Emissive_SS1_02a_LOD
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-500045280);	//ss1_02_ss1_emissive_ss1_02
+		DISABLE_OCCLUSION_THIS_FRAME();
 		DeleteScenarioPedAtCoords(-607.4993f, 59.0075f, 101.3167f, pedScenario);
 		DeleteScenarioPedAtCoords(-593.8669f, 48.3100f, 86.9158f, pedScenario);
 	}
 
 	//Richards Majestic Apartments culling
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -937.5001f, -376.2820f, 37.9613f) < distance &&
-		(currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-929.0226f, -379.9931f, 108.03774f) ||	//Richards Majestic, Apt 51
-		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-905.5511f, -375.1243f, 84.0079f))		//Richards Majestic, Apt. 4
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -937.5001f, -376.2820f, 37.9613f) < distance &&
+		(currentInterior == GET_INTERIOR_AT_COORDS(-929.0226f, -379.9931f, 108.03774f) ||	//Richards Majestic, Apt 51
+		currentInterior == GET_INTERIOR_AT_COORDS(-905.5511f, -375.1243f, 84.0079f))		//Richards Majestic, Apt. 4
 		)
 	{
 		EnableHighEndApartment(-929.0226f, -379.9931f, 108.03774f);
 		EnableHighEndApartment(-905.5511f, -375.1243f, 84.0079f);
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-952859393);	//bh1_08_bld2
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(935186440);		//bh1_emissive_bh1_08
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(1828238070);	//bh1_08_bld2_LOD
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-603554352);	//bh1_08_em
-		GRAPHICS::DISABLE_OCCLUSION_THIS_FRAME();
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-952859393);	//bh1_08_bld2
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(935186440);		//bh1_emissive_bh1_08
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(1828238070);	//bh1_08_bld2_LOD
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-603554352);	//bh1_08_em
+		DISABLE_OCCLUSION_THIS_FRAME();
 		DeleteScenarioPedAtCoords(-918.3259f, -375.0222f, 102.7300f, pedScenario);
 		DeleteScenarioPedAtCoords(-911.7831f, -376.1330f, 78.7702f, pedScenario);
 	}
 
 	//4 Integrity Way Apartments culling
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -47.9679f, -587.2177f, 36.9580f) < distance &&
-		(currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-15.0248f, -590.8832f, 98.8302f) ||	//4 Integrity Way, Apt. 35
-		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-36.1545f, -581.2134f, 88.7091f))		//4 Integrity Way, Apt. 30
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -47.9679f, -587.2177f, 36.9580f) < distance &&
+		(currentInterior == GET_INTERIOR_AT_COORDS(-15.0248f, -590.8832f, 98.8302f) ||	//4 Integrity Way, Apt. 35
+		currentInterior == GET_INTERIOR_AT_COORDS(-36.1545f, -581.2134f, 88.7091f))		//4 Integrity Way, Apt. 30
 		)
 	{
 		EnableHighEndApartment(-15.0248f, -590.8832f, 98.8302f);
 		EnableHighEndApartment(-36.1545f, -581.2134f, 88.7091f);
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-180177302);	//dt1_03_build1x
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-1825769292);	//DT1_Emissive_DT1_03_b1
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-285026450);	//dt1_03_dt1_Emissive_b1
-		GRAPHICS::DISABLE_OCCLUSION_THIS_FRAME();
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-180177302);	//dt1_03_build1x
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-1825769292);	//DT1_Emissive_DT1_03_b1
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-285026450);	//dt1_03_dt1_Emissive_b1
+		DISABLE_OCCLUSION_THIS_FRAME();
 		DeleteScenarioPedAtCoords(-18.9438f, -597.9114f, 93.5225f, pedScenario);
 		DeleteScenarioPedAtCoords(-27.8779f, -584.8820f, 83.4045f, pedScenario);
 	}
 
 	//3 Alta Street Tower Apartments culling
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -262.5153f, -971.1097f, 30.2198f) < distance &&
-		(currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-272.4795f, -940.1398f, 91.5109f) ||	//3 Alta Street Tower, Apt 57
-		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-270.7699f, -968.1721f, 76.2314f))		//3 Alta Street Tower, Apt 10
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -262.5153f, -971.1097f, 30.2198f) < distance &&
+		(currentInterior == GET_INTERIOR_AT_COORDS(-272.4795f, -940.1398f, 91.5109f) ||	//3 Alta Street Tower, Apt 57
+		currentInterior == GET_INTERIOR_AT_COORDS(-270.7699f, -968.1721f, 76.2314f))		//3 Alta Street Tower, Apt 10
 		)
 	{
 		EnableHighEndApartment(-272.4795f, -940.1398f, 91.5109f);
 		EnableHighEndApartment(-270.7699f, -968.1721f, 76.2314f);
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-1294038851);	//dt1_20_build2
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-312225717);	//dt1_20_dt1_emissive_dt1_20
-		GRAPHICS::DISABLE_OCCLUSION_THIS_FRAME();
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-1294038851);	//dt1_20_build2
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-312225717);	//dt1_20_dt1_emissive_dt1_20
+		DISABLE_OCCLUSION_THIS_FRAME();
 		DeleteScenarioPedAtCoords(-276.4401f, -950.4869f, 85.8006f, pedScenario);
 		DeleteScenarioPedAtCoords(-266.7457f, -957.8518f, 70.5210f, pedScenario);
 	}
 
 	//Del Perro Heights Apartments culling
-	if (SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -1442.0504f, -545.0800f, 33.7418f) < distance &&
-		(currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-1451.538f, -523.6300f, 68.5566f) ||	//Del Perro Heights, Apt 20
-		currentInterior == INTERIOR::GET_INTERIOR_AT_COORDS(-1451.538f, -523.6300f, 55.9290f))		//Del Perro Heights, Apt 7
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, -1442.0504f, -545.0800f, 33.7418f) < distance &&
+		(currentInterior == GET_INTERIOR_AT_COORDS(-1451.538f, -523.6300f, 68.5566f) ||	//Del Perro Heights, Apt 20
+		currentInterior == GET_INTERIOR_AT_COORDS(-1451.538f, -523.6300f, 55.9290f))		//Del Perro Heights, Apt 7
 		)
 	{
 		EnableHighEndApartment(-1451.538f, -523.6300f, 68.5566f);
 		EnableHighEndApartment(-1451.538f, -523.6300f, 55.9290f);
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-160801422);	//sm_14_bld2
-		INTERIOR::ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-1969201018);	//sm_14_emissive
-		GRAPHICS::DISABLE_OCCLUSION_THIS_FRAME();
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-160801422);	//sm_14_bld2
+		ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(-1969201018);	//sm_14_emissive
+		DISABLE_OCCLUSION_THIS_FRAME();
 		DeleteScenarioPedAtCoords(-1460.754f, -529.7892f, 62.8463f, pedScenario);
 		DeleteScenarioPedAtCoords(-1460.754f, -529.7892f, 50.2187f, pedScenario);
 	}
@@ -354,6 +354,36 @@ void Teleports()
 	{
 		HighEndApartmentsCulling();
 		HighEndApartments();
+	}
+	return;
+}
+
+void LoadApartmentsAtStartup()
+{
+	if (!IS_SCREEN_FADING_IN())
+		return;
+
+	Vector3 loc = GET_ENTITY_COORDS(playerPed, false);
+	int interiors[4] = { 
+						GET_INTERIOR_AT_COORDS_WITH_TYPE(loc.x, loc.y, loc.z, "v_studio_lo"), 
+						GET_INTERIOR_AT_COORDS_WITH_TYPE(loc.x, loc.y, loc.z, "v_apart_midspaz"),
+						GET_INTERIOR_AT_COORDS_WITH_TYPE(loc.x, loc.y, loc.z, "v_apartment_high"),
+						GET_INTERIOR_AT_COORDS_WITH_TYPE(loc.x, loc.y, loc.z, "v_motel_mp")
+					   };
+
+	for (int i = 0; i < 4; i++) {
+		if (!IS_VALID_INTERIOR(interiors[i]))
+			continue;
+
+		EnableInterior(interiors[i]);
+		while (!IS_INTERIOR_READY(interiors[i]))
+		{
+			FREEZE_ENTITY_POSITION(playerPed, true);
+			WAIT(0);
+		}
+		FREEZE_ENTITY_POSITION(playerPed, false);
+
+		break;
 	}
 	return;
 }

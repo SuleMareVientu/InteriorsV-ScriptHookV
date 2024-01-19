@@ -10,6 +10,19 @@ This mod is **not compatibile** with MPmaps, disable them before installing.
 
 **Requires [ScriptHookV](http://www.dev-c.com/gtav/scripthookv/)**
 
+**v2.0** - Changelog:
+- **Most of the code has been rewritten** to resemble R* way of handling the door system, should also improve performance
+- Fixed quick saving and loading while inside an apartment
+- Most barriers are now unlocked automatically (can be toggled inside the INI)
+- Functioning sliding doors have been added:
+   - **24 gates** around the map, they open both while on foot or in a vehicle (can be toggled inside the INI)
+   - Union Depository elevators (teleports to the vault)
+- Opened Michael's bathroom window, it automatically closes when it's raining to be more realistic
+- Miscellaneous - Unlocked:
+   - Josh Bernstein's House Gates
+   - Epsilon Center Gates
+   - Cletus Ewing's House Gate
+
 **v1.4.1** - Changelog: Fixed mission compatibility.
 
 **v1.4** - Changelog: Fixed crashes and teleports, general improvements.

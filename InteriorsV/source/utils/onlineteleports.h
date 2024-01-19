@@ -2,3 +2,4 @@
 
 void Teleports();
 void HighEndApartmentsCulling();
+void LoadApartmentsAtStartup();

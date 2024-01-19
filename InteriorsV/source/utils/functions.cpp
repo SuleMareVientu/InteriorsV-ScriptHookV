@@ -7,15 +7,15 @@
 #include "../script.h"
 #include "onlineteleports.h"
 
-Hash doorHash = NULL;
-
+Hash tempDoorHash = NULL;
 static int lastTimer = 0;
 static float lastMarkerOutX = 0.0f;
 static float lastMarkerOutZ = 0.0f;
-static float markerStartX = 0.0f;
-static float markerStartY = 0.0f;
-static float markerStartZ = 0.0f;
-static float headingStartGlobal = 0.0f;
+//Default values when teleporting for the first time from a low/medium end apartment
+static float markerStartX = 3.3769f;
+static float markerStartY = 36.5695f;
+static float markerStartZ = 70.5354f;
+static float headingStartGlobal = 170.0f;
 
 /*
 #include "string"
@@ -29,217 +29,258 @@ char* ToString(Any var)
 
 void Print(char* string, int ms)
 {
-	HUD::BEGIN_TEXT_COMMAND_PRINT("STRING");
-	HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(string);
-	HUD::END_TEXT_COMMAND_PRINT(ms, 1);
+	BEGIN_TEXT_COMMAND_PRINT("STRING");
+	ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(string);
+	END_TEXT_COMMAND_PRINT(ms, 1);
 	return;
 }
 
 void PrintInt(int value, int ms)
 {
-	HUD::BEGIN_TEXT_COMMAND_PRINT("NUMBER");
-	HUD::ADD_TEXT_COMPONENT_INTEGER(value);
-	HUD::END_TEXT_COMMAND_PRINT(ms, 1);
+	BEGIN_TEXT_COMMAND_PRINT("NUMBER");
+	ADD_TEXT_COMPONENT_INTEGER(value);
+	END_TEXT_COMMAND_PRINT(ms, 1);
 	return;
 }
 
 void PrintFloat(float value, int ms)
 {
-	HUD::BEGIN_TEXT_COMMAND_PRINT("NUMBER");
-	HUD::ADD_TEXT_COMPONENT_FLOAT(value, 4);
-	HUD::END_TEXT_COMMAND_PRINT(ms, 1);
+	BEGIN_TEXT_COMMAND_PRINT("NUMBER");
+	ADD_TEXT_COMPONENT_FLOAT(value, 4);
+	END_TEXT_COMMAND_PRINT(ms, 1);
 	return;
 }
 
 void PrintHelp(char* string)
 {
-	HUD::BEGIN_TEXT_COMMAND_DISPLAY_HELP("STRING");
-	HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(string);
-	HUD::END_TEXT_COMMAND_DISPLAY_HELP(0, false, false, -1);
+	BEGIN_TEXT_COMMAND_DISPLAY_HELP("STRING");
+	ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(string);
+	END_TEXT_COMMAND_DISPLAY_HELP(0, false, false, -1);
 	return;
 }
 
 void LoadIPL(char* ipl)
 {
-	if (!STREAMING::IS_IPL_ACTIVE(ipl))
-		STREAMING::REQUEST_IPL(ipl);
+	if (!IS_IPL_ACTIVE(ipl))
+		REQUEST_IPL(ipl);
 	return;
 }
 
 void UnloadIPL(char* ipl)
 {
-	if (STREAMING::IS_IPL_ACTIVE(ipl))
-		STREAMING::REMOVE_IPL(ipl);
+	if (IS_IPL_ACTIVE(ipl))
+		REMOVE_IPL(ipl);
 	return;
 }
 
 void EnableInterior(int interior)
 {
-	if (INTERIOR::IS_INTERIOR_DISABLED(interior) || INTERIOR::IS_INTERIOR_CAPPED(interior))
+	if (!IS_VALID_INTERIOR(interior))
+		return;
+
+	bool isDisabled = IS_INTERIOR_DISABLED(interior);
+	bool isCapped = IS_INTERIOR_CAPPED(interior);
+
+	if (isDisabled || isCapped)
 	{
-		INTERIOR::PIN_INTERIOR_IN_MEMORY(interior);
-		STREAMING::SET_INTERIOR_ACTIVE(interior, true);
-		INTERIOR::DISABLE_INTERIOR(interior, false);
-		INTERIOR::CAP_INTERIOR(interior, false);
+		PIN_INTERIOR_IN_MEMORY(interior);
+		SET_INTERIOR_ACTIVE(interior, true);
+		if (isDisabled)
+			DISABLE_INTERIOR(interior, false);
+		if (isCapped)
+			CAP_INTERIOR(interior, false);
 	}
 	return;
 }
 
 void DisableInterior(int interior)
 {
-	if (!INTERIOR::IS_INTERIOR_DISABLED(interior))
+	if (!IS_VALID_INTERIOR(interior))
+		return;
+
+	if (!IS_INTERIOR_DISABLED(interior))
 	{
-		STREAMING::SET_INTERIOR_ACTIVE(interior, false);
-		INTERIOR::UNPIN_INTERIOR(interior);
-		INTERIOR::DISABLE_INTERIOR(interior, true);
+		SET_INTERIOR_ACTIVE(interior, false);
+		UNPIN_INTERIOR(interior);
+		CAP_INTERIOR(interior, true);
+		DISABLE_INTERIOR(interior, true);
 	}
 	return;
 }
 
-void AltUnlockDoor(Hash EntityHash, float x, float y, float z)
+void SetDoorState(Hash DoorHash, int state, bool requestDoor, bool forceUpdate)
 {
-	if (OBJECT::DOOR_SYSTEM_FIND_EXISTING_DOOR(x, y, z, EntityHash, &doorHash))
+	if (!IS_DOOR_REGISTERED_WITH_SYSTEM(DoorHash) || DOOR_SYSTEM_GET_DOOR_STATE(DoorHash) == state)
+		return;
+	
+	DOOR_SYSTEM_SET_DOOR_STATE(DoorHash, state, requestDoor, forceUpdate);
+	return;
+}
+
+void SetDoorStateAtCoords(Hash EntityHash, float x, float y, float z, int state, bool forceUpdate, bool requestDoor)
+{
+	if (DOOR_SYSTEM_FIND_EXISTING_DOOR(x, y, z, EntityHash, &tempDoorHash))
 	{
-		if (OBJECT::DOOR_SYSTEM_GET_DOOR_STATE(doorHash) != 0)
-			OBJECT::DOOR_SYSTEM_SET_DOOR_STATE(doorHash, 0, false, false);
+		if (DOOR_SYSTEM_GET_DOOR_STATE(tempDoorHash) != state)
+			DOOR_SYSTEM_SET_DOOR_STATE(tempDoorHash, state, requestDoor, forceUpdate);
 	}
 	return;
 }
 
-void ForceUnlockDoor(Hash EntityHash, float x, float y, float z, int seed)
+void SetAutoDoorState(Hash doorHash, int state, float rate, float distance, bool forceUpdate)
 {
-	if (!OBJECT::DOOR_SYSTEM_FIND_EXISTING_DOOR(x, y, z, EntityHash, &doorHash))
+	if (rate >= 0.0f)
+		DOOR_SYSTEM_SET_AUTOMATIC_RATE(doorHash, rate, false, false);
+	if (distance >= 0.0f)
+		DOOR_SYSTEM_SET_AUTOMATIC_DISTANCE(doorHash, distance, false, false);
+
+	DOOR_SYSTEM_SET_DOOR_STATE(doorHash, state, false, forceUpdate);
+	return;
+}
+
+void SetSlidingDoorsStateAtCoords(Hash EntityHash, float x1, float y1, float z1, float x2, float y2, float z2, bool state, float openRatio, float minDistance, float maxDistance, bool removeSpring)
+{
+	float distance = VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, ((x1 + x2) * 0.5f), ((y1 + y2) * 0.5f), ((z1 + z2) * 0.5f));
+	if (distance < (minDistance * minDistance))
 	{
-		Hash newDoorHash = EntityHash + seed;
-		Object door = OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(x, y, z, 0.5f, EntityHash, false, true, true);
-		if (ENTITY::DOES_ENTITY_EXIST(door))
-		{
-			ENTITY::SET_ENTITY_AS_MISSION_ENTITY(door, true, true);
-			OBJECT::DELETE_OBJECT(&door);
-		}
-		OBJECT::ADD_DOOR_TO_SYSTEM(newDoorHash, EntityHash, x, y, z, false, false, false);
-		OBJECT::DOOR_SYSTEM_SET_DOOR_STATE(newDoorHash, 0, false, false);
+		SET_STATE_OF_CLOSEST_DOOR_OF_TYPE(EntityHash, x1, y1, z1, state, openRatio, removeSpring);
+		SET_STATE_OF_CLOSEST_DOOR_OF_TYPE(EntityHash, x2, y2, z2, state, openRatio, removeSpring);
+	}
+	else if (distance > (maxDistance * maxDistance))
+	{
+		SET_STATE_OF_CLOSEST_DOOR_OF_TYPE(EntityHash, x1, y1, z1, state, -openRatio, removeSpring);
+		SET_STATE_OF_CLOSEST_DOOR_OF_TYPE(EntityHash, x2, y2, z2, state, -openRatio, removeSpring);	}
+	return;
+}
+
+void SetSingleSlidingDoorStateAtCoords(Hash EntityHash, float x, float y, float z, float offsetX, float offsetY, bool state, float openRatio, float minDistance, float maxDistance, bool removeSpring)
+{
+	if (VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, x, y, z) > 750.0f)
+		return;
+
+	Object door = GET_CLOSEST_OBJECT_OF_TYPE(x, y, z, 10.0f, EntityHash, false, false, false);
+	if (!DOES_ENTITY_EXIST(door))
+		return;
+
+	Vector3 worldOffsetCoords = GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(door, offsetX, offsetY, 0.0f);
+	float distance = VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, worldOffsetCoords.x, worldOffsetCoords.y, z);
+	if (distance < (minDistance * minDistance))
+		SET_STATE_OF_CLOSEST_DOOR_OF_TYPE(EntityHash, x, y, z, state, openRatio, removeSpring);
+	else if (distance > (maxDistance * maxDistance))
+		SET_STATE_OF_CLOSEST_DOOR_OF_TYPE(EntityHash, x, y, z, state, -openRatio, removeSpring);
+	return;
+}
+
+void SetSpecialGatesStateAtCoords(Hash EntityHash, Hash SecondaryEntityHash, float x1, float y1, float z1, float x2, float y2, float z2, bool state, float openRatio, float minDistance, float maxDistance, bool removeSpring)
+{
+	float distance = VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, ((x1 + x2) * 0.5f), ((y1 + y2) * 0.5f), ((z1 + z2) * 0.5f));
+	if (distance < (minDistance * minDistance))
+	{
+		SET_STATE_OF_CLOSEST_DOOR_OF_TYPE(EntityHash, x1, y1, z1, state, openRatio, removeSpring);
+		SET_STATE_OF_CLOSEST_DOOR_OF_TYPE(SecondaryEntityHash, x2, y2, z2, state, -openRatio, removeSpring);
+	}
+	else if (distance > (maxDistance * maxDistance))
+	{
+		SET_STATE_OF_CLOSEST_DOOR_OF_TYPE(EntityHash, x1, y1, z1, state, -openRatio, removeSpring);
+		SET_STATE_OF_CLOSEST_DOOR_OF_TYPE(SecondaryEntityHash, x2, y2, z2, state, openRatio, removeSpring);
 	}
 	return;
 }
 
-void SetDoorUnlockDistance(Hash EntityHash, float x, float y, float z, float distance)
+bool DeleteObjectAtCoords(Hash EntityHash, float x, float y, float z, float radius)
 {
-	if (OBJECT::DOOR_SYSTEM_FIND_EXISTING_DOOR(x, y, z, EntityHash, &doorHash))
-	{
-		OBJECT::DOOR_SYSTEM_SET_DOOR_STATE(doorHash, 0, false, false);
-		OBJECT::DOOR_SYSTEM_SET_AUTOMATIC_DISTANCE(doorHash, distance, false, false);
-	}
-	return;
-}
+	Object obj = GET_CLOSEST_OBJECT_OF_TYPE(x, y, z, radius, EntityHash, false, true, true);
+	if (!DOES_ENTITY_EXIST(obj))
+		return false;
 
-void SetDoorUnlockDistanceWithRate(Hash EntityHash, float x, float y, float z, float rate, float distance)
-{
-	if (OBJECT::DOOR_SYSTEM_FIND_EXISTING_DOOR(x, y, z, EntityHash, &doorHash))
-	{
-		OBJECT::DOOR_SYSTEM_SET_DOOR_STATE(doorHash, 0, false, false);
-		OBJECT::DOOR_SYSTEM_SET_AUTOMATIC_RATE(doorHash, rate, false, false);
-		OBJECT::DOOR_SYSTEM_SET_AUTOMATIC_DISTANCE(doorHash, distance, false, false);
-	}
-	return;
-}
-
-void DeleteObjectAtCoords(Hash EntityHash, float x, float y, float z)
-{
-	Object obj = OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(x, y, z, 0.5f, EntityHash, false, true, true);
-	if (ENTITY::DOES_ENTITY_EXIST(obj))
-	{
-		ENTITY::SET_ENTITY_AS_MISSION_ENTITY(obj, true, true);
-		OBJECT::DELETE_OBJECT(&obj);
-	}
-	return;
-}
-
-void DeletePedAtCoords(float x, float y, float z)
-{
-	Ped ped = NULL;
-	PED::SET_SCENARIO_PEDS_TO_BE_RETURNED_BY_NEXT_COMMAND(true);
-	PED::GET_CLOSEST_PED(x, y, z, 0.5f, true, true, &ped, false, true, -1);
-	if (ENTITY::DOES_ENTITY_EXIST(ped))
-	{
-		ENTITY::SET_ENTITY_AS_MISSION_ENTITY(ped, true, true);
-		PED::DELETE_PED(&ped);
-	}
-	return;
+	SET_ENTITY_AS_MISSION_ENTITY(obj, true, true);
+	DELETE_OBJECT(&obj);
+	return true;
 }
 
 void DeleteScenarioPedAtCoords(float x, float y, float z, char* scenario)
 {
 	Ped ped = NULL;
-	PED::SET_SCENARIO_PEDS_TO_BE_RETURNED_BY_NEXT_COMMAND(true);
-	PED::GET_CLOSEST_PED(x, y, z, 0.5f, true, true, &ped, false, true, -1);
-	if (ENTITY::DOES_ENTITY_EXIST(ped) && PED::IS_PED_USING_SCENARIO(ped, scenario))
+	SET_SCENARIO_PEDS_TO_BE_RETURNED_BY_NEXT_COMMAND(true);
+	GET_CLOSEST_PED(x, y, z, 0.5f, true, true, &ped, false, true, -1);
+	if (DOES_ENTITY_EXIST(ped) && IS_PED_USING_SCENARIO(ped, scenario))
 	{
-		ENTITY::SET_ENTITY_AS_MISSION_ENTITY(ped, true, true);
-		PED::DELETE_PED(&ped);
+		SET_ENTITY_AS_MISSION_ENTITY(ped, true, true);
+		DELETE_PED(&ped);
 	}
+	return;
+}
+
+void SetObjectYawAtCoords(Hash hash, float x, float y, float z, float yaw)
+{
+	Object door = GET_CLOSEST_OBJECT_OF_TYPE(x, y, z, 0.3f, hash, false, false, false);
+
+	if (!DOES_ENTITY_EXIST(door))
+		return;
+
+	SET_ENTITY_HEADING(door, yaw);
 	return;
 }
 
 void EnableInteriorProp(int interior, char* prop, bool refresh)
 {
-	if (!INTERIOR::IS_INTERIOR_ENTITY_SET_ACTIVE(interior, prop))
+	if (!IS_INTERIOR_ENTITY_SET_ACTIVE(interior, prop))
 	{
-		INTERIOR::ACTIVATE_INTERIOR_ENTITY_SET(interior, prop);
+		ACTIVATE_INTERIOR_ENTITY_SET(interior, prop);
 		if (refresh)
-			INTERIOR::REFRESH_INTERIOR(interior);
+			REFRESH_INTERIOR(interior);
 	}
 	return;
 }
 
 void DisableInteriorProp(int interior, char* prop, bool refresh)
 {
-	if (INTERIOR::IS_INTERIOR_ENTITY_SET_ACTIVE(interior, prop))
+	if (IS_INTERIOR_ENTITY_SET_ACTIVE(interior, prop))
 	{
-		INTERIOR::DEACTIVATE_INTERIOR_ENTITY_SET(interior, prop);
+		DEACTIVATE_INTERIOR_ENTITY_SET(interior, prop);
 		if (refresh)
-			INTERIOR::REFRESH_INTERIOR(interior);
+			REFRESH_INTERIOR(interior);
 	}
 	return;
 }
 
 void SetScenarioGroup(char* scenarioGroup, bool toggle)
 {
-	if (TASK::DOES_SCENARIO_GROUP_EXIST(scenarioGroup))
+	if (DOES_SCENARIO_GROUP_EXIST(scenarioGroup))
 	{
-		if (toggle && !TASK::IS_SCENARIO_GROUP_ENABLED(scenarioGroup))
-			TASK::SET_SCENARIO_GROUP_ENABLED(scenarioGroup, true);
-		else if (!toggle && TASK::IS_SCENARIO_GROUP_ENABLED(scenarioGroup))
-			TASK::SET_SCENARIO_GROUP_ENABLED(scenarioGroup, false);
+		if (toggle && !IS_SCENARIO_GROUP_ENABLED(scenarioGroup))
+			SET_SCENARIO_GROUP_ENABLED(scenarioGroup, true);
+		else if (!toggle && IS_SCENARIO_GROUP_ENABLED(scenarioGroup))
+			SET_SCENARIO_GROUP_ENABLED(scenarioGroup, false);
 	}
 	return;
 }
 
 void AddBlip(float x, float y, float z, float scale, char* title, int id, int colour)
 {
-	Blip blip = HUD::ADD_BLIP_FOR_COORD(x, y, z);
-	HUD::SET_BLIP_SPRITE(blip, id);
-	HUD::SET_BLIP_DISPLAY(blip, 4);
-	HUD::SET_BLIP_SCALE(blip, scale);
-	HUD::SET_BLIP_COLOUR(blip, colour);
-	HUD::SET_BLIP_AS_SHORT_RANGE(blip, true);
-	HUD::BEGIN_TEXT_COMMAND_SET_BLIP_NAME("STRING");
-	HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(title);
-	HUD::END_TEXT_COMMAND_SET_BLIP_NAME(blip);
+	Blip blip = ADD_BLIP_FOR_COORD(x, y, z);
+	SET_BLIP_SPRITE(blip, id);
+	SET_BLIP_DISPLAY(blip, 4);
+	SET_BLIP_SCALE(blip, scale);
+	SET_BLIP_COLOUR(blip, colour);
+	SET_BLIP_AS_SHORT_RANGE(blip, true);
+	BEGIN_TEXT_COMMAND_SET_BLIP_NAME("STRING");
+	ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(title);
+	END_TEXT_COMMAND_SET_BLIP_NAME(blip);
 	return;
 }
 
 bool AdditionalChecks(Ped ped)
 {
-	if (PED::IS_PED_RAGDOLL(ped)			||
-		TASK::IS_PED_GETTING_UP(ped)		||
-		PED::IS_PED_FALLING(ped)			||
-		PED::IS_PED_JUMPING(ped)			||
-		PED::IS_PED_IN_MELEE_COMBAT(ped)	||
-		PED::IS_PED_IN_COVER(ped, false)	||
-		PED::IS_PED_SHOOTING(ped)			||
-		!PED::IS_PED_ON_FOOT(ped)			||
-		PED::IS_PED_TAKING_OFF_HELMET(ped))
+	if (IS_PED_RAGDOLL(ped)				||
+		IS_PED_GETTING_UP(ped)			||
+		IS_PED_FALLING(ped)				||
+		IS_PED_JUMPING(ped)				||
+		IS_PED_IN_MELEE_COMBAT(ped)		||
+		IS_PED_IN_COVER(ped, false)		||
+		IS_PED_SHOOTING(ped)			||
+		!IS_PED_ON_FOOT(ped)			||
+		IS_PED_TAKING_OFF_HELMET(ped))
 		return false;
 	else
 		return true;
@@ -247,19 +288,19 @@ bool AdditionalChecks(Ped ped)
 
 bool Teleport(float x, float y, float z, float heading, float headingOut, float markerX, float markerY, float markerZ, int red, int green, int blue, int alpha, char* text, char* textOut, bool overlapCheck)
 {
-	float distanceStart = SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, markerX, markerY, markerZ);
-	float distanceEnd = SYSTEM::VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, x, y, z);
+	float distanceStart = VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, markerX, markerY, markerZ);
+	float distanceEnd = VDIST2(playerLoc.x, playerLoc.y, playerLoc.z, x, y, z);
 
 	if (distanceStart < distance)
-		GRAPHICS::DRAW_MARKER(1, markerX, markerY, markerZ, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.75f, 0.75f, 0.75f, red, green, blue, alpha, false, false, 2, false, NULL, NULL, false);
+		DRAW_MARKER(1, markerX, markerY, markerZ, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.75f, 0.75f, 0.75f, red, green, blue, alpha, false, false, 2, false, NULL, NULL, false);
 
 	//Check for overlap with other markers at same coords (low-end and medium apartments)
-	if (distanceEnd < distance && (lastTimer != SYSTEM::TIMERA() || (lastTimer == SYSTEM::TIMERA() && (x != lastMarkerOutX || z != lastMarkerOutZ))))
+	if (distanceEnd < distance && (lastTimer != TIMERA() || (lastTimer == TIMERA() && (x != lastMarkerOutX || z != lastMarkerOutZ))))
 	{
-		GRAPHICS::DRAW_MARKER(1, x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.75f, 0.75f, 0.75f, red, green, blue, alpha, false, false, 2, false, NULL, NULL, false);
+		DRAW_MARKER(1, x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.75f, 0.75f, 0.75f, red, green, blue, alpha, false, false, 2, false, NULL, NULL, false);
 		lastMarkerOutX = x;
 		lastMarkerOutZ = z;
-		lastTimer = SYSTEM::TIMERA();
+		lastTimer = TIMERA();
 	}
 
 	//Prevent player overlapping with floor
@@ -269,41 +310,41 @@ bool Teleport(float x, float y, float z, float heading, float headingOut, float 
 	if (distanceStart < 2.25f)
 	{
 		PrintHelp(text);
-		if (PAD::IS_DISABLED_CONTROL_JUST_PRESSED(2, 23) && AdditionalChecks(playerPed) && !CAM::IS_SCREEN_FADING_IN() && !CAM::IS_SCREEN_FADED_OUT())
+		if (IS_DISABLED_CONTROL_JUST_PRESSED(2, 23) && AdditionalChecks(playerPed) && !IS_SCREEN_FADING_IN() && !IS_SCREEN_FADED_OUT())
 		{
 			isInsideApartment = true;
-			ENTITY::FREEZE_ENTITY_POSITION(playerPed, true);
-			CAM::DO_SCREEN_FADE_OUT(300);
-			while (!CAM::IS_SCREEN_FADED_OUT())
+			FREEZE_ENTITY_POSITION(playerPed, true);
+			DO_SCREEN_FADE_OUT(300);
+			while (!IS_SCREEN_FADED_OUT())
 			{
 				WAIT(0);
 			}
 
-			ENTITY::SET_ENTITY_COORDS_NO_OFFSET(playerPed, x, y, z, false, false, false);
+			SET_ENTITY_COORDS_NO_OFFSET(playerPed, x, y, z, false, false, false);
 			playerLoc = { x, playerLoc._paddingx , y, playerLoc._paddingy, z, playerLoc._paddingz };
-			ENTITY::SET_ENTITY_HEADING(playerPed, heading);
-			CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(0.0f);
-			CAM::SET_GAMEPLAY_CAM_RELATIVE_PITCH(0.0f, 0.0f);
+			SET_ENTITY_HEADING(playerPed, heading);
+			SET_GAMEPLAY_CAM_RELATIVE_HEADING(0.0f);
+			SET_GAMEPLAY_CAM_RELATIVE_PITCH(0.0f, 0.0f);
 			
 			//Asset streaming check
 			update();
 			HighEndApartmentsCulling();
-			int interior = INTERIOR::GET_INTERIOR_AT_COORDS(x, y, z);
+			int interior = GET_INTERIOR_AT_COORDS(x, y, z);
 			//Compatibility with 4 Integrity Way apartments and Union Depository
 			if (interior != 0 &&
-				interior != INTERIOR::GET_INTERIOR_AT_COORDS(-47.0121f, -584.5853f, 36.9580f)	&&	//4 Integrity Way apartments
-				interior != INTERIOR::GET_INTERIOR_AT_COORDS(-0.1434f, -705.9488f, 15.1312f)		//Union Depository Vault
+				interior != GET_INTERIOR_AT_COORDS(-47.0121f, -584.5853f, 36.9580f)	&&	//4 Integrity Way apartments
+				interior != GET_INTERIOR_AT_COORDS(-0.1434f, -705.9488f, 15.1312f)		//Union Depository Vault
 				)
 			{
-				while (INTERIOR::IS_VALID_INTERIOR(interior) && !INTERIOR::IS_INTERIOR_READY(interior))
+				while (IS_VALID_INTERIOR(interior) && !IS_INTERIOR_READY(interior))
 				{
 					WAIT(0);
 				}
 			}
-			STREAMING::LOAD_SCENE(x, y, z);
+			LOAD_SCENE(x, y, z);
 
-			ENTITY::FREEZE_ENTITY_POSITION(playerPed, false);
-			CAM::DO_SCREEN_FADE_IN(300);
+			FREEZE_ENTITY_POSITION(playerPed, false);
+			DO_SCREEN_FADE_IN(300);
 			if (overlapCheck)
 			{
 				markerStartX = markerX;
@@ -319,7 +360,7 @@ bool Teleport(float x, float y, float z, float heading, float headingOut, float 
 	if (distanceEnd < 2.25f)
 	{
 		PrintHelp(textOut);
-		if (PAD::IS_DISABLED_CONTROL_JUST_PRESSED(2, 23) && AdditionalChecks(playerPed) && !CAM::IS_SCREEN_FADING_IN() && !CAM::IS_SCREEN_FADED_OUT())
+		if (IS_DISABLED_CONTROL_JUST_PRESSED(2, 23) && AdditionalChecks(playerPed) && !IS_SCREEN_FADING_IN() && !IS_SCREEN_FADED_OUT())
 		{
 			if (overlapCheck)
 			{
@@ -330,37 +371,37 @@ bool Teleport(float x, float y, float z, float heading, float headingOut, float 
 			}
 
 			isInsideApartment = false;
-			ENTITY::FREEZE_ENTITY_POSITION(playerPed, true);
-			CAM::DO_SCREEN_FADE_OUT(300);
-			while (!CAM::IS_SCREEN_FADED_OUT())
+			FREEZE_ENTITY_POSITION(playerPed, true);
+			DO_SCREEN_FADE_OUT(300);
+			while (!IS_SCREEN_FADED_OUT())
 			{
 				WAIT(0);
 			}
 
-			ENTITY::SET_ENTITY_COORDS_NO_OFFSET(playerPed, markerX, markerY, markerZ, false, false, false);
+			SET_ENTITY_COORDS_NO_OFFSET(playerPed, markerX, markerY, markerZ, false, false, false);
 			playerLoc = { markerX, playerLoc._paddingx , markerY, playerLoc._paddingy, markerZ, playerLoc._paddingz };
-			ENTITY::SET_ENTITY_HEADING(playerPed, headingOut);
-			CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(0.0f);
-			CAM::SET_GAMEPLAY_CAM_RELATIVE_PITCH(0.0f, 0.0f);
+			SET_ENTITY_HEADING(playerPed, headingOut);
+			SET_GAMEPLAY_CAM_RELATIVE_HEADING(0.0f);
+			SET_GAMEPLAY_CAM_RELATIVE_PITCH(0.0f, 0.0f);
 			
 			//Asset streaming check
 			update();
 			//Compatibility with 4 Integrity Way apartments and Union Depository
-			int interior = INTERIOR::GET_INTERIOR_AT_COORDS(markerX, markerY, markerZ);
+			int interior = GET_INTERIOR_AT_COORDS(markerX, markerY, markerZ);
 			if (interior != 0 && 
-				interior != INTERIOR::GET_INTERIOR_AT_COORDS(-47.0121f, -584.5853f, 36.9580f)	&&	//4 Integrity Way apartments
-				interior != INTERIOR::GET_INTERIOR_AT_COORDS(10.3384f, -671.1154f, 32.4495f)		//Union Depository Parking
+				interior != GET_INTERIOR_AT_COORDS(-47.0121f, -584.5853f, 36.9580f)	&&	//4 Integrity Way apartments
+				interior != GET_INTERIOR_AT_COORDS(10.3384f, -671.1154f, 32.4495f)		//Union Depository Parking
 				)
 			{
-				while (INTERIOR::IS_VALID_INTERIOR(interior) && !INTERIOR::IS_INTERIOR_READY(interior))
+				while (IS_VALID_INTERIOR(interior) && !IS_INTERIOR_READY(interior))
 				{
 					WAIT(0);
 				}
 			}
-			STREAMING::LOAD_SCENE(markerX, markerY, markerZ);
+			LOAD_SCENE(markerX, markerY, markerZ);
 
-			ENTITY::FREEZE_ENTITY_POSITION(playerPed, false);
-			CAM::DO_SCREEN_FADE_IN(300);
+			FREEZE_ENTITY_POSITION(playerPed, false);
+			DO_SCREEN_FADE_IN(300);
 		}
 	}
 	return false;
