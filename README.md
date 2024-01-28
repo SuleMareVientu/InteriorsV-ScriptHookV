@@ -1,17 +1,17 @@
 # InteriorsV-ScriptHookV [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
 ![Screenshot](https://github.com/SuleMareVientu/InteriorsV-ScriptHookV/blob/images/InteriorsV.png?raw=true)
-Open-source and lore-friendly alternative to Open All Interiors script. 
+Open-source and lore-friendly alternative to [Open All Interiors](https://www.gta5-mods.com/scripts/open-all-interiors).
 
-It does not include the latest online interiors (from MPmaps), but it does include various optimizations for low-end hardware and story mode compatibility.
+It does not include the latest online interiors (from MP maps), but it does include various optimizations for low-end hardware and story mode compatibility.
 
-This mod is **not compatibile** with MPmaps, disable them before installing.
+This mod is **not compatible** with MP maps, disable them before using.
 
 #### Use the INI to configure it to your liking and use the F3 key (while not in the pause menu) to toggle blips on or off
 
 **Requires [ScriptHookV](http://www.dev-c.com/gtav/scripthookv/)**
 
 **v2.0** - Changelog:
-- **Most of the code has been rewritten** to resemble R* way of handling the door system, should also improve performance
+- **Most of the code has been rewritten** to resemble the R* way of handling the door system, which should also improve performance
 - Fixed quick saving and loading while inside an apartment
 - Most barriers are now unlocked automatically (can be toggled inside the INI)
 - Functioning sliding doors have been added:
@@ -57,7 +57,7 @@ This mod is **not compatibile** with MPmaps, disable them before installing.
 - New Functionalities:
     - Blip Toggle in-game (F3 to activate while NOT in pause menu) 
     - Story compatibility can now be disabled (Vangelico will remain open after the heist etc.)
-    - Story blips and online apartments blips can be disabled separately (enabled by default)
+    - Story blips and online apartment blips can be disabled separately (enabled by default)
     - Improved compatibility with missions & story mode
     - Updated natives and optimized code
     - Fixed numerous bugs
