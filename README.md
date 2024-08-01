@@ -1,4 +1,4 @@
-# InteriorsV-ScriptHookV [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
+# InteriorsV-ScriptHookV [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa] [![GitHub all releases](https://img.shields.io/github/downloads/SuleMareVientu/InteriorsV-ScriptHookV/total?label=Total%20Downloads&logo=GitHub)](https://github.com/SuleMareVientu/InteriorsV-ScriptHookV/releases/latest)
 ![Screenshot](https://github.com/SuleMareVientu/InteriorsV-ScriptHookV/blob/images/InteriorsV.png?raw=true)
 Open-source and lore-friendly alternative to [Open All Interiors](https://www.gta5-mods.com/scripts/open-all-interiors).
 
